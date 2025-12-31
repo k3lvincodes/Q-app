@@ -1,0 +1,58 @@
+import { Link } from 'expo-router';
+import React from 'react';
+import { Text, View } from 'react-native';
+
+interface Transaction {
+  id: number;
+  user_id: string;
+  amount: number;
+  type: string;
+  description?: string;
+  related_request_id?: number;
+  created_at: string;
+}
+
+interface TransactionsProps {
+  transactions: Transaction[];
+}
+
+const formatDate = (dateString?: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-NG', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+const Transactions = ({ transactions }: TransactionsProps) => {
+  return (
+    <View className='pt-8'>
+      <View className='flex-row justify-between items-center mb-4'>
+        <Text className='font-bold text-lg text-[#1E293B]'>Recent Transactions</Text>
+        <Link href={'/transactions'} className='text-[#EF5323] font-medium text-base'>View all</Link>
+      </View>
+      {transactions && transactions.length > 0 ? (
+        transactions.slice(0, 3).map((tx) => (
+          <View key={tx.id} className='flex-row justify-between items-center py-3 border-b border-gray-100'>
+            <View className='flex-1'>
+              <Text className={`font-semibold ${tx.type === 'credit' ? 'text-green-600' : 'text-red-500'}`}>
+                {tx.type === 'credit' ? '+ ' : '- '}₦{tx.amount.toLocaleString()}
+              </Text>
+              {tx.description && (
+                <Text className='text-gray-500 text-sm mt-0.5' numberOfLines={1}>{tx.description}</Text>
+              )}
+              <Text className='text-gray-400 text-xs mt-1'>{formatDate(tx.created_at)}</Text>
+            </View>
+            <Text className='text-gray-500 capitalize'>{tx.type}</Text>
+          </View>
+        ))
+      ) : (
+        <Text className='pt-2 text-[#64748B]'>No Recent Transactions</Text>
+      )}
+    </View>
+  )
+}
+
+export default Transactions
