@@ -22,6 +22,7 @@ interface Plan {
 interface Subscription {
   id: number;
   name: string;
+  price?: number;
   image_url?: string;
   subscription_plans: Plan[];
 }
@@ -65,7 +66,13 @@ const SubDetail = () => {
 
         setSubscription(subResponse.data as any);
         setTransactions(transResponse.data as any || []);
-        setBalance(profileResponse.data?.balance || 0);
+
+        // Calculate balance dynamically from transactions to match Dashboard
+        const calculatedBalance = (transResponse.data as any || []).reduce((acc: number, tx: any) => {
+          return tx.type === 'credit' ? acc + tx.amount : acc - tx.amount;
+        }, 0);
+
+        setBalance(calculatedBalance);
       } catch (err) {
         setError(err as Error);
       } finally {
@@ -93,7 +100,17 @@ const SubDetail = () => {
     },
   ];
 
-  // balance is now state
+  const getMinPrice = () => {
+    if (!subscription) return 0;
+    if (subscription.subscription_plans && subscription.subscription_plans.length > 0) {
+      const prices = subscription.subscription_plans.map(p => p.price_per_member);
+      return Math.min(...prices);
+    }
+    return subscription.price || 0;
+  };
+
+  const minPrice = getMinPrice();
+  const hasEnoughBalance = balance >= minPrice;
 
   if (loading) {
     return (
@@ -143,20 +160,17 @@ const SubDetail = () => {
           </View>
         )}
       />
-      <TouchableOpacity onPress={() => setModalVisible(true)}>
+      <TouchableOpacity
+        onPress={() => hasEnoughBalance && setModalVisible(true)}
+        disabled={!hasEnoughBalance}
+      >
         <Text
-          className={`rounded-full py-5 mx-auto mt-20 px-10 text-white font-bold text-center w-full ${balance ? "bg-bg" : "bg-bg/10"}`}
+          className={`rounded-full py-5 mx-auto mt-20 px-10 text-white font-bold text-center w-full ${hasEnoughBalance ? "bg-bg" : "bg-bg/50"}`}
         >
-          {balance ? "Agree and continue" : "Balance not enough"}
+          {hasEnoughBalance ? "Agree and continue" : `Insufficient Balance (Min: ₦${minPrice.toLocaleString()})`}
         </Text>
       </TouchableOpacity>
-      {balance ? (
-        ""
-      ) : (
-        <Text className="text-center text-bg pt-5">
-          Visit dashboard and deposit
-        </Text>
-      )}
+
       <ServiceModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}

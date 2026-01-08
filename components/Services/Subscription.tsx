@@ -7,11 +7,28 @@ interface Service {
   name: string;
   slots_available: number;
   price: number;
+  subscription_plans?: { price_per_member: number }[];
 }
 
 interface SubscriptionProps {
   services: Service[];
 }
+
+const getPriceDisplay = (service: Service) => {
+  if (!service.subscription_plans || service.subscription_plans.length === 0) {
+    return service.price ? `₦${service.price.toLocaleString()}` : "₦/A";
+  }
+
+  const prices = service.subscription_plans.map(p => p.price_per_member);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+
+  if (minPrice === maxPrice) {
+    return `₦${minPrice.toLocaleString()}`;
+  }
+
+  return `₦${minPrice.toLocaleString()} - ₦${maxPrice.toLocaleString()}`;
+};
 
 const Subscription = ({ services }: SubscriptionProps) => {
   return (
@@ -32,12 +49,12 @@ const Subscription = ({ services }: SubscriptionProps) => {
                 {/* <Image source={{uri: item.image_url}} /> */}
                 <View className="gap-2">
                   <Text className="font-bold">{item.name}</Text>
-                  <Text className="">Family Available: {item.slots_available}</Text>
+                  <Text className="">Crew Available: {item.slots_available}</Text>
                 </View>
               </TouchableOpacity>
-              <View className="items-center gap-2">
+              <View className="items-end gap-2">
                 <Container />
-                <Text className="font-bold">₦{item.price}/ Month</Text>
+                <Text className="font-bold">{getPriceDisplay(item)}/ Month</Text>
               </View>
             </View>
           );

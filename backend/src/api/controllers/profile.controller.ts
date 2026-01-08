@@ -1,12 +1,21 @@
 import { Response } from 'express';
 import { supabase } from '../../config/supabase';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
+import { recalculateUserBalance } from '../utils/balanceUtils';
 
 export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
   const user = req.user;
 
   if (!user) {
     return res.status(401).json({ error: 'User not authenticated.' });
+  }
+
+  // Sync balance before fetching
+  try {
+    await recalculateUserBalance(user.id);
+  } catch (err) {
+    console.error('Failed to sync balance on profile load:', err);
+    // Continue properly even if sync fails, to show at least old data
   }
 
   const { data, error } = await supabase

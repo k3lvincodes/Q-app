@@ -96,7 +96,13 @@ const Dashboard = () => {
 
       setSubscriptions(formattedSubs);
       setTransactions(transResponse.data as any || []);
-      setBalance(profileResponse.data?.balance || 0);
+
+      // Calculate balance dynamically from transactions
+      const calculatedBalance = (transResponse.data as any || []).reduce((acc: number, tx: any) => {
+        return tx.type === 'credit' ? acc + tx.amount : acc - tx.amount;
+      }, 0);
+
+      setBalance(calculatedBalance);
 
     } catch (err) {
       setError(err as Error);
@@ -166,21 +172,12 @@ const Dashboard = () => {
             setTransactions((prev) => [payload.new as Transaction, ...prev]);
             // Optionally refresh balance here if we trust the API to update it fast enough
             // or rely on the profile listener below
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'profiles',
-            filter: `id=eq.${user.id}`
-          },
-          (payload) => {
-            console.log('Profile updated:', payload.new);
-            if (payload.new.balance !== undefined) {
-              setBalance(payload.new.balance);
-            }
+
+            // Update balance locally based on the new transaction
+            setBalance((prev) => {
+              const amount = payload.new.amount || 0;
+              return payload.new.type === 'credit' ? prev + amount : prev - amount;
+            });
           }
         )
         .subscribe((status) => {
@@ -230,7 +227,12 @@ const Dashboard = () => {
       />
 
       {/* Main Content with Animation */}
-      <Animated.View className="px-5 pb-20" style={animatedStyle}>
+      <Animated.ScrollView
+        className="px-5"
+        contentContainerStyle={{ paddingBottom: 80 }}
+        style={animatedStyle}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View className="flex-row justify-between items-center mb-8 mt-[0px]">
           <TouchableOpacity
@@ -291,13 +293,13 @@ const Dashboard = () => {
           <Crew subscriptions={subscriptions} />
         </View>
 
-        <Transactions transactions={transactions} />
+        <Transactions transactions={transactions.slice(0, 3)} />
 
         <DepositModal
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}
         />
-      </Animated.View>
+      </Animated.ScrollView>
     </SafeAreaView>
   );
 };

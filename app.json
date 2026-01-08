@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "q",
-    "slug": "q",
+    "name": "JoinQ",
+    "slug": "joinq",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/svg/logo.svg",
-    "scheme": "q",
+    "icon": "./assets/images/icon.png",
+    "scheme": "joinq",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

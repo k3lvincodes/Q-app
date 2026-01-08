@@ -12,6 +12,7 @@ interface Service {
   slots_available: number;
   price: number;
   category: string;
+  subscription_plans?: { price_per_member: number }[];
 }
 
 const Discover = () => {
@@ -24,7 +25,7 @@ const Discover = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const { data, error } = await supabase.from('subscription_services').select('*');
+        const { data, error } = await supabase.from('subscription_services').select('*, subscription_plans(price_per_member)');
         if (error) throw error;
         setServices(data as any || []);
         setFilteredServices(data as any || []);

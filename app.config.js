@@ -2,12 +2,12 @@ import 'dotenv/config';
 
 export default {
     expo: {
-        name: "q",
-        slug: "q",
+        name: "JoinQ",
+        slug: "joinq",
         version: "1.0.0",
         orientation: "portrait",
         icon: "./assets/svg/logo.svg",
-        scheme: "q",
+        scheme: "joinq",
         userInterfaceStyle: "automatic",
         newArchEnabled: true,
         ios: {
@@ -22,7 +22,7 @@ export default {
             },
             edgeToEdgeEnabled: true,
             predictiveBackGestureEnabled: false,
-            package: "com.anonymous.q"
+            package: "com.k3boys.qmobile"
         },
         web: {
             output: "static",
@@ -50,6 +50,9 @@ export default {
         },
         extra: {
             QUORIX_API_KEY: process.env.QUORIX_API_KEY,
+            eas: {
+                projectId: "e62de87a-7630-4de6-b839-e2022aebbb23"
+            }
         }
     }
 };
