@@ -106,7 +106,7 @@ const Notification = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-[#F6F4F1]">
+      <SafeAreaView className="flex-1 justify-center items-center bg-[#F6F4F1] dark:bg-black">
         <ActivityIndicator size="large" color="#EF5323" />
       </SafeAreaView>
     );
@@ -114,8 +114,8 @@ const Notification = () => {
 
   if (error) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-[#F6F4F1]">
-        <Text>Error: {error.message}</Text>
+      <SafeAreaView className="flex-1 justify-center items-center bg-[#F6F4F1] dark:bg-black">
+        <Text className="dark:text-white">Error: {error.message}</Text>
       </SafeAreaView>
     );
   }
@@ -123,14 +123,14 @@ const Notification = () => {
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F6F4F1]">
+    <SafeAreaView className="flex-1 bg-[#F6F4F1] dark:bg-black">
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 pb-4 mt-[0px]">
         <View className="flex-row items-center gap-5">
           <TouchableOpacity onPress={() => router.back()}>
             <Arrow />
           </TouchableOpacity>
-          <Text className="text-[#1E293B] text-xl font-bold">Notifications</Text>
+          <Text className="text-[#1E293B] dark:text-gray-200 text-xl font-bold">Notifications</Text>
         </View>
         {unreadCount > 0 && (
           <TouchableOpacity onPress={handleMarkAllRead}>
@@ -140,7 +140,7 @@ const Notification = () => {
       </View>
 
       {/* Tabs */}
-      <View className="flex-row mx-5 mb-4 bg-white rounded-full p-1">
+      <View className="flex-row mx-5 mb-4 bg-white dark:bg-[#1E1E1E] rounded-full p-1">
         <TouchableOpacity
           onPress={() => setActiveTab('notifications')}
           className={`flex-1 py-3 rounded-full ${activeTab === 'notifications' ? 'bg-[#EF5323]' : ''}`}
@@ -160,7 +160,7 @@ const Notification = () => {
       </View>
 
       {/* Content */}
-      <View className="flex-1 mx-5 bg-white rounded-2xl shadow-sm">
+      <View className="flex-1 mx-5 bg-white dark:bg-[#1E1E1E] rounded-2xl shadow-sm">
         {activeTab === 'notifications' ? (
           <FlatList
             data={notifications}
@@ -180,7 +180,7 @@ const Notification = () => {
                   <Wallet width={20} height={20} />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-gray-800">{item.message}</Text>
+                  <Text className="text-gray-800 dark:text-gray-200">{item.message}</Text>
                   <Text className="text-gray-400 text-xs mt-1">{formatTimeAgo(item.created_at)}</Text>
                 </View>
                 {!item.is_read && (
@@ -216,7 +216,7 @@ const Notification = () => {
                     {item.type === 'credit' ? '+ ' : '- '}₦{item.amount.toLocaleString()}
                   </Text>
                   {item.description && (
-                    <Text className="text-gray-600 text-sm mt-1">{item.description}</Text>
+                    <Text className="text-gray-600 dark:text-gray-400 text-sm mt-1">{item.description}</Text>
                   )}
                   <Text className="text-gray-400 text-xs mt-1">{formatTimeAgo(item.created_at)}</Text>
                 </View>

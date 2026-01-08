@@ -88,7 +88,7 @@ const Transactions = () => {
 
     if (loading) {
         return (
-            <SafeAreaView className="flex-1 justify-center items-center bg-[#F6F4F1]">
+            <SafeAreaView className="flex-1 justify-center items-center bg-[#F6F4F1] dark:bg-black">
                 <ActivityIndicator size="large" color="#EF5323" />
             </SafeAreaView>
         );
@@ -96,8 +96,8 @@ const Transactions = () => {
 
     if (error) {
         return (
-            <SafeAreaView className="flex-1 justify-center items-center bg-[#F6F4F1]">
-                <Text>Error: {error.message}</Text>
+            <SafeAreaView className="flex-1 justify-center items-center bg-[#F6F4F1] dark:bg-black">
+                <Text className="dark:text-white">Error: {error.message}</Text>
             </SafeAreaView>
         );
     }
@@ -108,25 +108,25 @@ const Transactions = () => {
     );
 
     return (
-        <SafeAreaView className="flex-1 bg-[#F6F4F1]">
+        <SafeAreaView className="flex-1 bg-[#F6F4F1] dark:bg-black">
             {/* Header */}
             <View className="flex-row items-center gap-5 px-5 pb-4 mt-[0px]">
                 <TouchableOpacity onPress={() => router.back()}>
                     <Arrow />
                 </TouchableOpacity>
-                <Text className="text-[#1E293B] text-xl font-bold">All Transactions</Text>
+                <Text className="text-[#1E293B] dark:text-gray-200 text-xl font-bold">All Transactions</Text>
             </View>
 
             {/* Balance Summary */}
-            <View className="mx-5 mb-4 p-4 bg-white rounded-2xl shadow-sm">
-                <Text className="text-gray-500 text-sm">Current Balance</Text>
+            <View className="mx-5 mb-4 p-4 bg-white dark:bg-[#1E1E1E] rounded-2xl shadow-sm">
+                <Text className="text-gray-500 dark:text-gray-400 text-sm">Current Balance</Text>
                 <Text className={`text-2xl font-bold ${totalBalance >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                     ₦{totalBalance.toLocaleString()}
                 </Text>
             </View>
 
             {/* Transactions List */}
-            <View className="flex-1 mx-5 bg-white rounded-2xl shadow-sm">
+            <View className="flex-1 mx-5 bg-white dark:bg-[#1E1E1E] rounded-2xl shadow-sm">
                 <FlatList
                     data={transactions}
                     keyExtractor={(item) => item.id.toString()}
@@ -137,13 +137,13 @@ const Transactions = () => {
                         </View>
                     }
                     renderItem={({ item }) => (
-                        <View className="flex-row justify-between items-start py-4 border-b border-gray-100">
+                        <View className="flex-row justify-between items-start py-4 border-b border-gray-100 dark:border-gray-800">
                             <View className="flex-1">
                                 <Text className={`font-semibold text-lg ${item.type === 'credit' ? 'text-green-600' : 'text-red-500'}`}>
                                     {item.type === 'credit' ? '+ ' : '- '}₦{item.amount.toLocaleString()}
                                 </Text>
                                 {item.description && (
-                                    <Text className="text-gray-600 mt-1">{item.description}</Text>
+                                    <Text className="text-gray-600 dark:text-gray-400 mt-1">{item.description}</Text>
                                 )}
                                 <Text className="text-gray-400 text-xs mt-2">{formatDate(item.created_at)}</Text>
                             </View>

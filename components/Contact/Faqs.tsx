@@ -46,22 +46,22 @@ const Faqs = () => {
     },
   ];
   return (
-    <View className="bg-white mx-5 p-5 mb-10 rounded-xl mt-10">
-      <Text className="text-center text-2xl font-semibold">FAQ</Text>
-      <View className="border border-gray-300 mt-5 rounded-xl py-5">
+    <View className="bg-white dark:bg-[#1E1E1E] mx-5 p-5 mb-10 rounded-xl mt-10">
+      <Text className="text-center text-2xl font-semibold dark:text-white">FAQ</Text>
+      <View className="border border-gray-300 dark:border-gray-700 mt-5 rounded-xl py-5">
         {faq.map((item, index) => (
           <React.Fragment key={item.id}>
             <View>
               <View className="flex-row px-5 justify-between">
-                <Text className="w-4/5">{item.title}</Text>
+                <Text className="w-4/5 dark:text-white">{item.title}</Text>
                 <Drop onPress={() => toggleAccordion(index)} />
               </View>
-              <Text className={isOpen === index ? "flex px-5 pt-5" : "hidden"}>
+              <Text className={isOpen === index ? "flex px-5 pt-5 dark:text-gray-300" : "hidden"}>
                 {item.text}
               </Text>
             </View>
             {index < faq.length - 1 && (
-              <View className="w-full h-[.1rem] my-5 bg-gray-300"></View>
+              <View className="w-full h-[.1rem] my-5 bg-gray-300 dark:bg-gray-700"></View>
             )}
           </React.Fragment>
         ))}

@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
+import { useColorScheme } from "nativewind";
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -14,7 +15,6 @@ import {
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import Display from "../../assets/svg/display.svg";
-import Next from "../../assets/svg/next.svg";
 
 type ModalType = {
   modalVisible: any;
@@ -24,6 +24,7 @@ type ModalType = {
 const AppModal = ({ modalVisible, setModalVisible }: ModalType) => {
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
+  const { colorScheme, setColorScheme } = useColorScheme();
 
   useEffect(() => {
     checkSupport();
@@ -87,8 +88,13 @@ const AppModal = ({ modalVisible, setModalVisible }: ModalType) => {
                   <Text className="text-gray-600">Display</Text>
                 </View>
                 <View className="flex-row gap-5 items-center">
-                  <Text className="text-gray-400">Light</Text>
-                  <Next width={20} height={20} />
+                  <Text className="text-gray-400 capitalize">{colorScheme}</Text>
+                  <Switch
+                    value={colorScheme === 'dark'}
+                    onValueChange={() => setColorScheme(colorScheme === 'dark' ? 'light' : 'dark')}
+                    trackColor={{ false: "#767577", true: "#EB4219" }}
+                    thumbColor={colorScheme === 'dark' ? "#fff" : "#f4f3f4"}
+                  />
                 </View>
               </View>
 

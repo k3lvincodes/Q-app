@@ -159,30 +159,32 @@ const Support = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-[#F6F4F1]">
+        <SafeAreaView className="flex-1 bg-[#F6F4F1] dark:bg-black">
             <View className="flex-row items-center gap-5 px-5 mt-[0px] mb-5">
                 <TouchableOpacity onPress={() => router.back()}>
                     <Arrow />
                 </TouchableOpacity>
-                <Text className="text-2xl font-bold">Contact Support</Text>
+                <Text className="text-2xl font-bold dark:text-white">Contact Support</Text>
             </View>
 
-            <ScrollView className="flex-1 px-5">
+            <ScrollView className="flex-1 px-5 dark:bg-black">
                 <View>
-                    <Text className="font-bold text-lg mb-2">Create New Ticket</Text>
+                    <Text className="font-bold text-lg mb-2 dark:text-white">Create New Ticket</Text>
                     <TextInput
                         placeholder="Subject"
+                        placeholderTextColor="#9CA3AF"
                         value={subject}
                         onChangeText={setSubject}
-                        className="border border-[#EB421933] p-3 rounded-lg mb-5 font-segoe bg-[#F6F4F1]"
+                        className="border border-[#EB421933] dark:border-gray-700 p-3 rounded-lg mb-5 font-segoe bg-[#F6F4F1] dark:bg-[#1E1E1E] dark:text-white"
                     />
                     <TextInput
                         placeholder="Message"
+                        placeholderTextColor="#9CA3AF"
                         value={message}
                         onChangeText={setMessage}
                         multiline
                         numberOfLines={4}
-                        className="border border-[#EB421933] p-3 rounded-lg mb-5 h-[147px] font-segoe bg-[#F6F4F1]"
+                        className="border border-[#EB421933] dark:border-gray-700 p-3 rounded-lg mb-5 h-[147px] font-segoe bg-[#F6F4F1] dark:bg-[#1E1E1E] dark:text-white"
                         style={{ textAlignVertical: 'top' }}
                     />
                     {loading ? (
@@ -195,20 +197,20 @@ const Support = () => {
                 </View>
 
                 <View>
-                    <Text className="font-bold text-lg mb-4">My Tickets</Text>
+                    <Text className="font-bold text-lg mb-4 dark:text-white">My Tickets</Text>
                     {fetchingTickets ? (
                         <ActivityIndicator color="#EF5323" />
                     ) : tickets.length === 0 ? (
-                        <Text className="text-gray-500">No tickets found.</Text>
+                        <Text className="text-gray-500 dark:text-gray-400">No tickets found.</Text>
                     ) : (
                         tickets.map(ticket => (
                             <TouchableOpacity
                                 key={ticket.id}
-                                className="bg-white p-4 rounded-lg mb-3 shadow-sm border border-gray-200"
+                                className="bg-white dark:bg-[#1E1E1E] p-4 rounded-lg mb-3 shadow-sm border border-gray-200 dark:border-gray-700"
                                 onPress={() => router.push(`/support/${ticket.id}`)}
                             >
                                 <View className="flex-row justify-between mb-2">
-                                    <Text className="font-bold text-base flex-1" numberOfLines={1}>{ticket.subject}</Text>
+                                    <Text className="font-bold text-base flex-1 dark:text-white" numberOfLines={1}>{ticket.subject}</Text>
                                     <Text className={`font-medium ${getStatusColor(ticket.status)}`}>{ticket.status}</Text>
                                 </View>
                                 <Text className="text-xs text-gray-400">ID: {ticket.ticket_id || ticket.id}</Text>

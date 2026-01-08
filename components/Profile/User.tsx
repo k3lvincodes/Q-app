@@ -37,13 +37,13 @@ const User = ({ user, onUpdate }: UserProps) => {
         <View>
           {isEditing ? (
             <>
-              <TextInput value={name} onChangeText={setName} className="text-2xl font-semibold" />
-              <TextInput value={email} onChangeText={setEmail} className="text-gray-500" />
+              <TextInput value={name} onChangeText={setName} className="text-2xl font-semibold dark:text-white" />
+              <TextInput value={email} onChangeText={setEmail} className="text-gray-500 dark:text-gray-400" />
             </>
           ) : (
             <>
-              <Text className="text-2xl font-semibold">{name}</Text>
-              <Text className="text-gray-500">{email}</Text>
+              <Text className="text-2xl font-semibold dark:text-white">{name}</Text>
+              <Text className="text-gray-500 dark:text-gray-400">{email}</Text>
             </>
           )}
         </View>

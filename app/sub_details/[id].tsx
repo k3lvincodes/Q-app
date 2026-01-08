@@ -114,7 +114,7 @@ const SubDetail = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center">
+      <SafeAreaView className="flex-1 justify-center items-center dark:bg-black">
         <ActivityIndicator size='large' />
       </SafeAreaView>
     );
@@ -130,14 +130,14 @@ const SubDetail = () => {
 
   if (!subscription) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center">
-        <Text>Subscription not found.</Text>
+      <SafeAreaView className="flex-1 justify-center items-center dark:bg-black">
+        <Text className="dark:text-white">Subscription not found.</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="px-5 flex-1">
+    <SafeAreaView className="px-5 flex-1 dark:bg-black">
       {subscription.image_url && (
         <Image
           className="w-[8rem] mb-10 mx-auto h-[8rem] rounded-full"
@@ -145,11 +145,11 @@ const SubDetail = () => {
           resizeMode="cover"
         />
       )}
-      <Text className="text-center pb-10 font-semibold mt-[0px] text-xl">
+      <Text className="text-center pb-10 font-semibold mt-[0px] text-xl dark:text-white">
         {subscription.name} by JointheQ
       </Text>
       <FlatList
-        className="bg-white rounded-xl py-5"
+        className="bg-white dark:bg-[#1E1E1E] rounded-xl py-5"
         data={list}
         renderItem={({ item }) => (
           <View className="flex-row rounded-xl gap-2 p-5">
@@ -174,7 +174,6 @@ const SubDetail = () => {
       <ServiceModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
-        setLoading={setLoading}
         service={subscription}
         balance={balance}
       />

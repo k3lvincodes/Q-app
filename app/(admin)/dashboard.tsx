@@ -53,14 +53,29 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                // Fetch Revenue (Sum of all credit transactions)
-                const { data: transactions, error: transError } = await supabase
-                    .from('transactions')
-                    .select('amount')
-                    .eq('type', 'credit');
+                // Get current month start and end dates
+                const now = new Date();
+                const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
 
-                if (transError) throw transError;
-                const totalRevenue = transactions?.reduce((sum, tx) => sum + (tx.amount || 0), 0) || 0;
+                // Fetch all active subscriptions from current month
+                const { data: subscriptions, error: subsError } = await supabase
+                    .from('user_subscriptions')
+                    .select(`
+                        *,
+                        subscription_plans (price_per_member)
+                    `)
+                    .in('status', ['active', 'confirmed', 'joined'])
+                    .gte('created_at', currentMonthStart.toISOString())
+                    .lte('created_at', currentMonthEnd.toISOString());
+
+                if (subsError) throw subsError;
+
+                // Calculate revenue from subscription prices
+                const totalRevenue = subscriptions?.reduce((sum, sub) => {
+                    const price = sub.subscription_plans?.price_per_member || 0;
+                    return sum + price;
+                }, 0) || 0;
 
                 // Fetch Users Count
                 const { count: usersCount, error: usersError } = await supabase

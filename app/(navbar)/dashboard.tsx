@@ -196,7 +196,7 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="h-full bg-[#F6F4F1] justify-center items-center">
+      <SafeAreaView className="h-full bg-[#F6F4F1] dark:bg-black justify-center items-center">
         <ActivityIndicator size="large" color="#EF5323" />
       </SafeAreaView>
     );
@@ -204,14 +204,14 @@ const Dashboard = () => {
 
   if (error) {
     return (
-      <SafeAreaView className="h-full bg-[#F6F4F1] justify-center items-center">
-        <Text>Error: {error.message}</Text>
+      <SafeAreaView className="h-full bg-[#F6F4F1] dark:bg-black justify-center items-center">
+        <Text className="dark:text-white">Error: {error.message}</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="h-full bg-[#F6F4F1]">
+    <SafeAreaView className="h-full bg-[#F6F4F1] dark:bg-black">
       {/* Dim overlay when menu is open */}
       {menuVisible && (
         <Pressable
@@ -250,10 +250,10 @@ const Dashboard = () => {
           </TouchableOpacity>
         </View>
 
-        <Text className="text-[#1E1E1E] opacity-80 text-lg mb-1 font-segoe-bold">My Balance</Text>
+        <Text className="text-[#1E1E1E] dark:text-gray-400 opacity-80 text-lg mb-1 font-segoe-bold">My Balance</Text>
         <View className="flex-row items-baseline mb-8">
-          <Text className="text-2xl font-bold text-[#1E1E1E]">₦</Text>
-          <Text className="text-[50px] font-bold font-segoe text-[#1E1E1E] leading-[60px] ml-1">
+          <Text className="text-2xl font-bold text-[#1E1E1E] dark:text-white">₦</Text>
+          <Text className="text-[50px] font-bold font-segoe text-[#1E1E1E] dark:text-white leading-[60px] ml-1">
             {balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </Text>
         </View>

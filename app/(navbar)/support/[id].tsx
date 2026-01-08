@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
-import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useRef, useState } from 'react';
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Arrow from "../../../assets/svg/arrow.svg";
@@ -66,24 +66,27 @@ const TicketDetail = () => {
         }
     };
 
-    useFocusEffect(
-        useCallback(() => {
-            fetchData();
+    useEffect(() => {
+        fetchData();
 
-            // Realtime subscription could be added here
-            const subscription = supabase
-                .channel('public:support_messages')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages', filter: `ticket_id=eq.${id}` },
-                    (payload) => {
-                        setMessages((prev) => [...prev, payload.new as Message]);
-                    })
-                .subscribe();
+        // Realtime subscription
+        const channel = supabase
+            .channel(`support_chat:${id}`)
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_messages', filter: `ticket_id=eq.${id}` },
+                (payload) => {
+                    const newMsg = payload.new as Message;
+                    setMessages((prev) => {
+                        // Prevent duplicates
+                        if (prev.some(msg => msg.id === newMsg.id)) return prev;
+                        return [...prev, newMsg];
+                    });
+                })
+            .subscribe();
 
-            return () => {
-                supabase.removeChannel(subscription);
-            };
-        }, [id])
-    );
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [id]);
 
     const sendMessage = async () => {
         if (!newMessage.trim() || !userId) return;

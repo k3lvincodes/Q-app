@@ -63,7 +63,7 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="h-full justify-center items-center">
+      <SafeAreaView className="h-full justify-center items-center dark:bg-black">
         <ActivityIndicator size="large" color="#0000ff" />
       </SafeAreaView>
     );
@@ -78,7 +78,7 @@ const Profile = () => {
   }
 
   return (
-    <SafeAreaView className='flex-1'>
+    <SafeAreaView className='flex-1 dark:bg-black'>
       <View className="flex-row items-center gap-5 px-5 mt-[0px]">
         <TouchableOpacity onPress={() => router.back()}>
           <Arrow />

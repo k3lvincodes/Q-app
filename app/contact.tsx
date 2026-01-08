@@ -7,15 +7,15 @@ import Arrow from "../assets/svg/arrow.svg";
 
 const contact = () => {
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1 dark:bg-black">
       <View className="flex-row items-center px-5 gap-5 mt-[0px]">
         <TouchableOpacity onPress={() => router.back()}>
           <Arrow />
         </TouchableOpacity>
         <Text className="text-bg text-xl ">Services</Text>
       </View>
-      <ScrollView>
-        <Text className="text-2xl text-center pt-10">How can we help you?</Text>
+      <ScrollView className="dark:bg-black">
+        <Text className="text-2xl text-center pt-10 dark:text-white">How can we help you?</Text>
         <Text className="text-center text-xs text-gray-400">Contact Us</Text>
         <Contact />
         <Faqs />

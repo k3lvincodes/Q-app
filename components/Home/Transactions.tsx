@@ -30,22 +30,22 @@ const Transactions = ({ transactions }: TransactionsProps) => {
   return (
     <View className='pt-8'>
       <View className='flex-row justify-between items-center mb-4'>
-        <Text className='font-bold text-lg text-[#1E293B]'>Recent Transactions</Text>
+        <Text className='font-bold text-lg text-[#1E293B] dark:text-white'>Recent Transactions</Text>
         <Link href={'/transactions'} className='text-[#EF5323] font-medium text-base'>View all</Link>
       </View>
       {transactions && transactions.length > 0 ? (
         transactions.slice(0, 3).map((tx) => (
-          <View key={tx.id} className='flex-row justify-between items-center py-3 border-b border-gray-100'>
+          <View key={tx.id} className='flex-row justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800'>
             <View className='flex-1'>
               <Text className={`font-semibold ${tx.type === 'credit' ? 'text-green-600' : 'text-red-500'}`}>
                 {tx.type === 'credit' ? '+ ' : '- '}₦{tx.amount.toLocaleString()}
               </Text>
               {tx.description && (
-                <Text className='text-gray-500 text-sm mt-0.5' numberOfLines={1}>{tx.description}</Text>
+                <Text className='text-gray-500 dark:text-gray-400 text-sm mt-0.5' numberOfLines={1}>{tx.description}</Text>
               )}
-              <Text className='text-gray-400 text-xs mt-1'>{formatDate(tx.created_at)}</Text>
+              <Text className='text-gray-400 dark:text-gray-500 text-xs mt-1'>{formatDate(tx.created_at)}</Text>
             </View>
-            <Text className='text-gray-500 capitalize'>{tx.type}</Text>
+            <Text className='text-gray-500 dark:text-gray-400 capitalize'>{tx.type}</Text>
           </View>
         ))
       ) : (

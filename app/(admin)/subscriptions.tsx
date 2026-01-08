@@ -42,20 +42,90 @@ const AdminSubscriptions = () => {
 
     const fetchData = async () => {
         try {
-            // 1. Fetch User Subscriptions with joins
-            const { data, error } = await supabase
+            console.log('🔍 Starting diagnostic queries...');
+
+            // Check current authenticated user
+            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            console.log('👤 Current user:', user?.id);
+            console.log('📧 User email:', user?.email);
+
+            // Check user's role from profiles table
+            if (user) {
+                const { data: profileData } = await supabase
+                    .from('profiles')
+                    .select('role, is_admin')
+                    .eq('id', user.id)
+                    .single();
+                console.log('🔐 User role:', profileData?.role || 'none');
+                console.log('👑 Is admin:', profileData?.is_admin || false);
+            }
+
+            // DIAGNOSTIC 1: Check raw user_subscriptions count (no joins)
+            const { data: rawSubsData, error: rawSubsError } = await supabase
                 .from('user_subscriptions')
+                .select('*');
+
+            console.log('📋 Raw user_subscriptions (no joins):', rawSubsData?.length || 0);
+            if (rawSubsError) console.error('❌ Raw subs error:', rawSubsError);
+            if (rawSubsData && rawSubsData.length > 0) {
+                console.log('First raw subscription:', rawSubsData[0]);
+            }
+
+            // DIAGNOSTIC 2: Check with one join at a time
+            const { data: withServiceJoin, error: serviceJoinError } = await supabase
+                .from('user_subscriptions')
+                .select('*, subscription_services (name)');
+
+            console.log('📋 With service join:', withServiceJoin?.length || 0);
+            if (serviceJoinError) console.error('❌ Service join error:', serviceJoinError);
+
+            const { data: withPlanJoin, error: planJoinError } = await supabase
+                .from('user_subscriptions')
+                .select('*, subscription_plans (price_per_member)');
+
+            console.log('📋 With plan join:', withPlanJoin?.length || 0);
+            if (planJoinError) console.error('❌ Plan join error:', planJoinError);
+
+            const { data: withProfileJoin, error: profileJoinError } = await supabase
+                .from('user_subscriptions')
+                .select('*, profiles (full_name)');
+
+            console.log('📋 With profile join:', withProfileJoin?.length || 0);
+            if (profileJoinError) console.error('❌ Profile join error:', profileJoinError);
+
+            // 1. Fetch all subscription services with their plans
+            const { data: servicesData, error: servicesError } = await supabase
+                .from('subscription_services')
                 .select(`
                     *,
-                    subscription_services (name, image_url),
-                    subscription_plans (price_per_member, members_limit),
-                    profiles (full_name, email, avatar_url)
+                    subscription_plans (*)
                 `)
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
+            if (servicesError) {
+                console.error('❌ Services fetch error:', servicesError);
+                throw servicesError;
+            }
 
-            if (data) {
+            // 2. Fetch all user subscriptions - using simpler query to avoid join issues
+            const { data: userSubsData, error: userSubsError } = await supabase
+                .from('user_subscriptions')
+                .select('*'); // Simplified - no joins initially
+
+            if (userSubsError) {
+                console.error('❌ User subs fetch error:', userSubsError);
+                throw userSubsError;
+            }
+
+            console.log('📊 Fetched Data:');
+            console.log('Services:', servicesData?.length || 0);
+            console.log('User Subscriptions:', userSubsData?.length || 0);
+            if (userSubsData && userSubsData.length > 0) {
+                console.log('First subscription:', userSubsData[0]);
+                console.log('All subscription statuses:', userSubsData.map((s: any) => s.status));
+            }
+
+            if (servicesData && userSubsData) {
                 let activeCount = 0;
                 let pendingCount = 0;
                 let cancelledCount = 0;
@@ -63,22 +133,82 @@ const AdminSubscriptions = () => {
                 const newQueue: SubscriptionItem[] = [];
                 const newActive: SubscriptionItem[] = [];
 
-                data.forEach((sub: any) => {
-                    const status = sub.status || 'pending';
-                    const price = sub.subscription_plans?.price_per_member || 0;
+                // Create a map to count members per plan
+                const memberCountByPlan: { [planId: string]: number } = {};
 
-                    // Stats
-                    if (status === 'active') {
-                        activeCount++;
-                        revenue += price;
-                        newActive.push(formatSubscription(sub));
-                    } else if (status === 'pending' || status === 'pending_approval') {
-                        pendingCount++;
-                        newQueue.push(formatSubscription(sub));
-                    } else if (status === 'cancelled') {
-                        cancelledCount++;
+                userSubsData.forEach((sub: any) => {
+                    const planId = sub.plan_id;
+                    if (planId) {
+                        memberCountByPlan[planId] = (memberCountByPlan[planId] || 0) + 1;
                     }
                 });
+
+                // Fetch all profiles, plans, and services for manual joining
+                const { data: allProfiles } = await supabase.from('profiles').select('*');
+                const { data: allPlans } = await supabase.from('subscription_plans').select('*');
+
+                const profilesMap = new Map(allProfiles?.map(p => [p.id, p]) || []);
+                const plansMap = new Map(allPlans?.map(p => [p.id, p]) || []);
+                const servicesMap = new Map(servicesData?.map(s => [s.id, s]) || []);
+
+                // Get current month start and end dates
+                const now = new Date();
+                const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+                // Process each user subscription
+                userSubsData.forEach((sub: any) => {
+                    const status = (sub.status || 'active').toLowerCase();
+                    const plan = plansMap.get(sub.plan_id);
+                    const service = servicesMap.get(sub.service_id);
+                    const profile = profilesMap.get(sub.user_id);
+
+                    const price = plan?.price_per_member || 0;
+                    const planId = sub.plan_id;
+                    const currentMembers = memberCountByPlan[planId] || 0;
+
+                    // Check if subscription is from current month
+                    const subDate = new Date(sub.start_date || sub.created_at);
+                    const isCurrentMonth = subDate >= currentMonthStart && subDate <= currentMonthEnd;
+
+                    console.log(`Processing subscription ${sub.id}: status="${status}", price=${price}, service="${service?.name}"`);
+
+                    // Create enriched subscription object
+                    const enrichedSub = {
+                        ...sub,
+                        subscription_plans: plan,
+                        subscription_services: service,
+                        profiles: profile
+                    };
+
+                    // Stats - More flexible status checking
+                    if (status === 'active' || status === 'confirmed' || status === 'joined') {
+                        activeCount++;
+                        // Only add to revenue if subscription is from current month
+                        if (isCurrentMonth) {
+                            revenue += price;
+                        }
+                        newActive.push(formatSubscription(enrichedSub, currentMembers));
+                        console.log('✅ Added to active subs');
+                    } else if (status === 'pending' || status === 'pending_approval' || status === 'awaiting_approval') {
+                        pendingCount++;
+                        newQueue.push(formatSubscription(enrichedSub, currentMembers));
+                        console.log('⏳ Added to pending queue');
+                    } else if (status === 'cancelled' || status === 'canceled' || status === 'rejected') {
+                        cancelledCount++;
+                        console.log('❌ Marked as cancelled');
+                    } else {
+                        // Unknown status - add to active to be safe
+                        console.log(`⚠️ Unknown status: "${status}", adding to active`);
+                        activeCount++;
+                        if (isCurrentMonth) {
+                            revenue += price;
+                        }
+                        newActive.push(formatSubscription(enrichedSub, currentMembers));
+                    }
+                });
+
+                console.log('📈 Final Stats:', { activeCount, pendingCount, cancelledCount, revenue });
 
                 setStats({
                     active: activeCount,
@@ -90,13 +220,13 @@ const AdminSubscriptions = () => {
                 setActiveSubs(newActive);
             }
         } catch (error) {
-            console.error('Error fetching subscriptions:', error);
+            console.error('❌ Error fetching subscriptions:', error);
         } finally {
             setRefreshing(false);
         }
     };
 
-    const formatSubscription = (sub: any): SubscriptionItem => ({
+    const formatSubscription = (sub: any, memberCount: number): SubscriptionItem => ({
         id: sub.id,
         user: sub.profiles?.full_name || 'Unknown',
         email: sub.profiles?.email || '',
@@ -107,7 +237,7 @@ const AdminSubscriptions = () => {
         price: sub.subscription_plans?.price_per_member || 0,
         renewalDate: sub.renewal_date ? new Date(sub.renewal_date).toLocaleDateString() : 'N/A',
         membersLimit: sub.subscription_plans?.members_limit || 0,
-        currentMembers: 1 // Placeholder hardcoded
+        currentMembers: memberCount // Now showing actual count from database
     });
 
     useFocusEffect(

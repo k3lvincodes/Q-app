@@ -13,14 +13,14 @@ interface CrewProps {
 const Crew = ({ subscriptions }: CrewProps) => {
   return (
     <View className="pt-8">
-      <Text className="font-bold text-[#1E293B] text-xl mb-6">{`Crew's  You're Part Of`}</Text>
+      <Text className="font-bold text-[#1E293B] dark:text-gray-200 text-xl mb-6">{`Crew's  You're Part Of`}</Text>
       <View>
         {subscriptions && subscriptions.length > 0 ? (
           subscriptions.map((sub) => (
-            <Text key={sub.id} className="text-center py-2">{sub.name}</Text>
+            <Text key={sub.id} className="text-center py-2 dark:text-gray-400">{sub.name}</Text>
           ))
         ) : (
-          <Text className="text-center text-[#1E293B] text-lg py-6">{`You haven't joined any crew yet.`}</Text>
+          <Text className="text-center text-[#1E293B] dark:text-gray-500 text-lg py-6">{`You haven't joined any crew yet.`}</Text>
         )}
       </View>
       <TouchableOpacity

@@ -46,7 +46,7 @@ const NewRequest = () => {
   };
 
   return (
-    <SafeAreaView className="px-5 bg-[#F6F4F1] h-full">
+    <SafeAreaView className="px-5 bg-[#F6F4F1] dark:bg-black h-full">
       <View className="flex-row items-center gap-5 mt-[0px]">
         <TouchableOpacity onPress={() => router.back()}>
           <Arrow />
@@ -55,19 +55,19 @@ const NewRequest = () => {
       </View>
       <View className="gap-5 pt-10">
         <View className="gap-3">
-          <Text className="font-semibold text-gray-600">
+          <Text className="font-semibold text-gray-600 dark:text-gray-300">
             Subscription Service
           </Text>
           <TextInput
             placeholder="Subscription Service"
             placeholderTextColor={"#4b5563"}
-            className="border border-bg/20 pl-5 h-[3.5rem] rounded-xl "
+            className="border border-bg/20 pl-5 h-[3.5rem] rounded-xl dark:text-white"
             value={serviceName}
             onChangeText={setServiceName}
           />
         </View>
         <View className="gap-3">
-          <Text className="font-semibold text-gray-600">Duration</Text>
+          <Text className="font-semibold text-gray-600 dark:text-gray-300">Duration</Text>
           <Dropdown
             style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
             placeholderStyle={{ fontSize: 14, color: "#4b5563" }}
@@ -88,13 +88,13 @@ const NewRequest = () => {
           />
         </View>
         <View className="gap-3">
-          <Text className="font-semibold text-gray-600">Request Notes</Text>
+          <Text className="font-semibold text-gray-600 dark:text-gray-300">Request Notes</Text>
           <TextInput
             placeholder="Subscription Service"
             textAlignVertical="top"
             multiline={true}
             placeholderTextColor={"#4b5563"}
-            className="border border-bg/20 pt-5 pl-5 h-[12rem] rounded-xl mb-auto"
+            className="border border-bg/20 pt-5 pl-5 h-[12rem] rounded-xl mb-auto dark:text-white"
             value={notes}
             onChangeText={setNotes}
           />

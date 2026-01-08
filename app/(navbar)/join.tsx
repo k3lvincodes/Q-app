@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   ScrollView,
   Switch,
@@ -21,6 +22,7 @@ import { supabase } from "../../utils/supabase";
 interface SubscriptionService {
   name: string;
   renewal_day: number;
+  image_url?: string;
 }
 
 interface UserSubscription {
@@ -92,7 +94,7 @@ const Join = () => {
     ];
 
     return (
-      <View className="bg-gray-200 rounded-xl mt-2 p-3">
+      <View className="bg-gray-200 dark:bg-gray-800 rounded-xl mt-2 p-3">
         <View className="flex-row justify-between items-center pt-2">
           <View className="flex-col items-start ">
             <View className="flex-row items-center">
@@ -102,7 +104,7 @@ const Join = () => {
                 trackColor={{ true: "#EB4219" }}
                 thumbColor={autoRenewEnabled ? "#ffff" : "#f4f3f4"}
               />
-              <Text className="ml-2 text-xs text-gray-600">Auto Renewal</Text>
+              <Text className="ml-2 text-xs text-gray-600 dark:text-gray-300">Auto Renewal</Text>
             </View>
           </View>
           <Pressable className="bg-bg rounded-full px-4 py-2">
@@ -110,21 +112,21 @@ const Join = () => {
           </Pressable>
         </View>
 
-        <View className="bg-white mt-4 py-2 rounded-xl">
+        <View className="bg-white dark:bg-gray-700 mt-4 py-2 rounded-xl">
           {details.map((item, index) => (
             <View key={item.key}>
               <View className="flex-row items-center px-4 py-3 justify-between">
                 <View className="flex-row items-center gap-3">
                   <item.icon width={18} height={18} />
-                  <Text className="text-gray-700 text-sm">{item.name}</Text>
+                  <Text className="text-gray-700 dark:text-gray-200 text-sm">{item.name}</Text>
                 </View>
                 <Text
-                  className={`text-gray-600 text-sm ${item.name === "Status" && item.text === "active" ? "bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium" : ""}`}
+                  className={`text-gray-600 dark:text-gray-300 text-sm ${item.name === "Status" && item.text === "active" ? "bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium" : ""}`}
                 >
                   {item.text}
                 </Text>
               </View>
-              {index < details.length - 1 && <View className="w-full h-[1px] bg-gray-100" />}
+              {index < details.length - 1 && <View className="w-full h-[1px] bg-gray-100 dark:bg-gray-600" />}
             </View>
           ))}
         </View>
@@ -134,14 +136,14 @@ const Join = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-[#F6F4F1]">
+      <SafeAreaView className="flex-1 justify-center items-center bg-[#F6F4F1] dark:bg-black">
         <ActivityIndicator size="large" color="#EB4219" />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F6F4F1]">
+    <SafeAreaView className="flex-1 bg-[#F6F4F1] dark:bg-black">
       <ScrollView className="px-5">
         <View className="flex-row pb-6 items-center gap-5 mt-[0px]">
           <TouchableOpacity onPress={() => router.back()}>
@@ -150,7 +152,7 @@ const Join = () => {
           <Text className="text-bg text-xl font-bold">Jointhequeue</Text>
         </View>
 
-        <Text className="text-2xl font-semibold text-black">Crew</Text>
+        <Text className="text-2xl font-semibold text-black dark:text-white">Crew</Text>
         <Text className="text-gray-500 mb-6">Crew you are a part of</Text>
 
         {subscriptions.length === 0 ? (
@@ -165,7 +167,15 @@ const Join = () => {
                 className="bg-bg flex-row items-center gap-4 rounded-xl p-4 shadow-sm"
               >
                 {/* Fallback Icon or Logic for Icon */}
-                <Prime width={24} height={24} />
+                {sub.subscription_services?.image_url ? (
+                  <Image
+                    source={{ uri: sub.subscription_services.image_url }}
+                    className="w-8 h-8 rounded-full bg-white"
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Prime width={24} height={24} />
+                )}
                 <Text className="text-xl text-white font-bold">{sub.subscription_services?.name || 'Service'}</Text>
               </TouchableOpacity>
 
