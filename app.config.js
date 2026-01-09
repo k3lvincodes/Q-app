@@ -6,10 +6,10 @@ export default {
         slug: "joinq",
         version: "1.0.0",
         orientation: "portrait",
-        icon: "./assets/svg/logo.svg",
+        icon: "./assets/images/icon.png",
         scheme: "joinq",
         userInterfaceStyle: "automatic",
-        newArchEnabled: true,
+        newArchEnabled: false,
         ios: {
             supportsTablet: true
         },
@@ -51,7 +51,7 @@ export default {
         extra: {
             QUORIX_API_KEY: process.env.QUORIX_API_KEY,
             eas: {
-                projectId: "e62de87a-7630-4de6-b839-e2022aebbb23"
+                projectId: "fb96b3e6-095c-4207-b0e4-f779203a8599"
             }
         }
     }
