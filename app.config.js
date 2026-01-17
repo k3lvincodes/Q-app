@@ -9,7 +9,7 @@ export default {
         icon: "./assets/images/icon.png",
         scheme: "joinq",
         userInterfaceStyle: "automatic",
-        newArchEnabled: false,
+        newArchEnabled: true,
         ios: {
             supportsTablet: true
         },
@@ -20,7 +20,7 @@ export default {
                 backgroundImage: "./assets/images/android-icon-background.png",
                 monochromeImage: "./assets/images/android-icon-monochrome.png"
             },
-            edgeToEdgeEnabled: true,
+            edgeToEdgeEnabled: false,
             predictiveBackGestureEnabled: false,
             package: "com.k3boys.qmobile"
         },
@@ -49,7 +49,7 @@ export default {
             reactCompiler: true
         },
         extra: {
-            QUORIX_API_KEY: process.env.QUORIX_API_KEY,
+            QUORIX_API_KEY: process.env.EXPO_PUBLIC_QUORIX_API_KEY,
             eas: {
                 projectId: "fb96b3e6-095c-4207-b0e4-f779203a8599"
             }
