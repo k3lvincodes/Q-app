@@ -2,6 +2,7 @@ import Crew from "@/components/Home/Crew";
 import DepositModal from "@/components/Home/DepositModal";
 import Transactions from "@/components/Home/Transactions";
 import UserMenu from "@/components/User/UserMenu";
+import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, BackHandler, Platform, Pressable, Text, ToastAndroid, TouchableOpacity, View } from "react-native";
@@ -40,6 +41,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [backPressedOnce, setBackPressedOnce] = useState(false);
+  const [showMoveToQ, setShowMoveToQ] = useState(false); // Default false until we check database
 
   // Animation for Refresh
   const translateY = useSharedValue(0);
@@ -78,7 +80,7 @@ const Dashboard = () => {
           .order('created_at', { ascending: false }),
         supabase
           .from('profiles')
-          .select('balance')
+          .select('balance, onboarding_completed')
           .eq('id', user.id)
           .single()
       ]);
@@ -86,6 +88,10 @@ const Dashboard = () => {
       if (subsResponse.error) throw subsResponse.error;
       if (transResponse.error) throw transResponse.error;
       if (profileResponse.error) throw profileResponse.error;
+
+      // Check onboarding status from profile data
+      const hasCompletedOnboarding = profileResponse.data?.onboarding_completed || false;
+      setShowMoveToQ(!hasCompletedOnboarding);
 
       const formattedSubs = subsResponse.data.map((sub: any) => ({
         id: sub.id,
@@ -113,6 +119,8 @@ const Dashboard = () => {
 
   useFocusEffect(
     React.useCallback(() => {
+      refreshData();
+
       const backAction = () => {
         if (menuVisible) {
           setMenuVisible(false);
@@ -142,7 +150,7 @@ const Dashboard = () => {
       );
 
       return () => backHandler.remove();
-    }, [backPressedOnce, menuVisible])
+    }, [backPressedOnce, menuVisible, refreshData])
   );
 
   useEffect(() => {
@@ -211,7 +219,7 @@ const Dashboard = () => {
   }
 
   return (
-    <SafeAreaView className="h-full bg-[#F6F4F1] dark:bg-black">
+    <SafeAreaView className="h-full bg-[#F6F4F1] dark:bg-black overflow-hidden">
       {/* Dim overlay when menu is open */}
       {menuVisible && (
         <Pressable
@@ -234,26 +242,26 @@ const Dashboard = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View className="flex-row justify-between items-center mb-8 mt-[0px]">
+        <View className="flex-row justify-between items-center mb-8 mt-[5px]">
           <TouchableOpacity
             onPress={() => setMenuVisible(true)}
-            className="p-2 -ml-2 rounded-full bg-[#EF5323]/10 border border-[#EF5323]"
+            className="p-3 rounded-full bg-white shadow-sm shadow-gray-200"
           >
             <HamburgerIcon width={24} height={24} color="#EF5323" />
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => router.push('/notification')}
-            className="p-2 -mr-2 rounded-full bg-[#EF5323]/10 border border-[#EF5323]"
+            className="p-3 rounded-full bg-white shadow-sm shadow-gray-200"
           >
             <NotificationIcon width={24} height={24} />
           </TouchableOpacity>
         </View>
 
-        <Text className="text-[#1E1E1E] dark:text-gray-400 opacity-80 text-lg mb-1 font-segoe-bold">My Balance</Text>
-        <View className="flex-row items-baseline mb-8">
-          <Text className="text-2xl font-bold text-[#1E1E1E] dark:text-white">₦</Text>
-          <Text className="text-[50px] font-bold font-segoe text-[#1E1E1E] dark:text-white leading-[60px] ml-1">
+        <Text className="text-[#1E1E1E] dark:text-gray-400 opacity-80 text-[14px] mb-4 font-segoe">My Balance</Text>
+        <View className="flex-row justify-center items-start mb-8">
+          <Text className="text-2xl font-bold text-[#1E1E1E] dark:text-white mt-1">₦</Text>
+          <Text className="text-[34px] font-bold font-segoe text-[#1E1E1E] dark:text-white leading-[40px] ml-1">
             {balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </Text>
         </View>
@@ -261,18 +269,18 @@ const Dashboard = () => {
         <View className="flex-row gap-5 mb-8 justify-between">
           <TouchableOpacity
             onPress={() => setModalVisible(true)}
-            className="flex-1 flex-row items-center px-6 py-5 justify-between bg-[#F9ECE9] rounded-[30px]"
+            className="flex-1 flex-row items-center px-6 h-[64px] justify-between bg-white rounded-[30px]"
           >
-            <Text className="text-[#EF5323] text-lg font-medium">Deposit</Text>
+            <Text className="text-[#EF5323] text-[14px] font-medium">Deposit</Text>
             <View className="bg-transparent rounded-full p-1 border border-[#EF5323] rounded-full">
               <Deposit width={20} height={20} color="#EF5323" />
             </View>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => router.push("/earnings")}
-            className="flex-1 flex-row items-center px-6 py-5 justify-between bg-[#F9ECE9] rounded-[30px]"
+            className="flex-1 flex-row items-center px-6 h-[64px] justify-between bg-white rounded-[30px]"
           >
-            <Text className="text-[#EF5323] text-lg font-medium">Earnings</Text>
+            <Text className="text-[#EF5323] text-[14px] font-medium">Earnings</Text>
             <View className="bg-transparent rounded-full p-1">
               <Earnings width={24} height={24} color="#EF5323" />
             </View>
@@ -281,11 +289,67 @@ const Dashboard = () => {
 
         <TouchableOpacity
           onPress={() => router.push('/newRequest')}
-          className="flex-row items-center px-6 py-5 justify-center gap-3 bg-[#EF5323] rounded-full mb-8 shadow-lg shadow-[#EF5323]/30"
+          className="flex-row items-center px-6 h-[64px] justify-center gap-3 bg-[#EF5323] rounded-full mb-8 shadow-lg shadow-[#EF5323]/30"
         >
-          <Text className="text-white text-xl font-segoe font-medium">New request</Text>
+          <Text className="text-white text-[14px] font-segoe font-medium">New request</Text>
           <View className="bg-white/20 rounded-full p-1">
             <Request width={20} height={20} color="white" />
+          </View>
+        </TouchableOpacity>
+
+        {/* Complete Your Move to Q Banner */}
+        {showMoveToQ && (
+          <TouchableOpacity
+            onPress={() => router.push('/onboard')}
+            className="bg-white rounded-[20px] mb-8 relative shadow-sm shadow-gray-100 h-[83px] justify-center px-5"
+          >
+            <TouchableOpacity
+              onPress={() => setShowMoveToQ(false)}
+              className="absolute top-3 right-4 z-10"
+            >
+              <Ionicons name="close-circle-outline" size={20} color="black" />
+            </TouchableOpacity>
+
+            <View className="items-center">
+              <Text className="text-[16px] font-poppins font-bold text-center text-[#1E1E1E] mb-1">Complete Your Move to Q</Text>
+              <Text className="text-gray-400 text-center text-[10px]">
+                Just a few steps left to bring your account into the Q app
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
+        {/* Q Envelope Banner */}
+        <TouchableOpacity
+          onPress={() => router.push('/envelope' as any)}
+          className="bg-[#991B1B] rounded-[30px] h-[83px] mb-8 relative overflow-hidden justify-center items-center"
+        >
+          {/* Background Hearts Pattern */}
+          <View className="absolute -left-4 -top-8 opacity-40 transform -rotate-12">
+            <Ionicons name="heart-outline" size={90} color="white" />
+          </View>
+          <View className="absolute left-24 -top-8 opacity-30 transform rotate-45">
+            <Ionicons name="heart-outline" size={50} color="white" />
+          </View>
+          <View className="absolute right-16 top-4 opacity-50 transform -rotate-12">
+            <Ionicons name="heart-outline" size={30} color="white" />
+          </View>
+          <View className="absolute -right-10 -top-4 opacity-40 transform rotate-12">
+            <Ionicons name="heart-outline" size={100} color="white" />
+          </View>
+          <View className="absolute left-10 -bottom-8 opacity-40 transform -rotate-12">
+            <Ionicons name="heart-outline" size={70} color="white" />
+          </View>
+          <View className="absolute right-32 -bottom-6 opacity-30 transform rotate-12">
+            <Ionicons name="heart-outline" size={60} color="white" />
+          </View>
+          <View className="absolute right-4 -bottom-8 opacity-40 transform -rotate-45">
+            <Ionicons name="heart-outline" size={70} color="white" />
+          </View>
+
+
+          <View className="bg-white/20 w-[116px] h-[26px] rounded-full backdrop-blur-md justify-center items-center">
+            <Text className="text-white text-[17.9px] font-segoe pb-[2px]">Q envelope</Text>
           </View>
         </TouchableOpacity>
 

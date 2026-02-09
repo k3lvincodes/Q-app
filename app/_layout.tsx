@@ -103,6 +103,8 @@ export default function RootLayout() {
       <Stack.Screen name="contact" options={{ headerShown: false }} />
       <Stack.Screen name="invite" options={{ headerShown: false }} />
       <Stack.Screen name="transactions" options={{ headerShown: false }} />
+      <Stack.Screen name="onboard" options={{ headerShown: false }} />
+      <Stack.Screen name="envelope" options={{ headerShown: false }} />
       <StatusBar backgroundColor='black' barStyle={'default'} />
     </Stack>
   );

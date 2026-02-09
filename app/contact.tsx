@@ -8,11 +8,11 @@ import Arrow from "../assets/svg/arrow.svg";
 const contact = () => {
   return (
     <SafeAreaView className="flex-1 dark:bg-black">
-      <View className="flex-row items-center px-5 gap-5 mt-[0px]">
+      <View className="flex-row items-center px-5 gap-5 mt-[5px]">
         <TouchableOpacity onPress={() => router.back()}>
           <Arrow />
         </TouchableOpacity>
-        <Text className="text-bg text-xl ">Services</Text>
+        <Text className="text-bg text-[14px] ">Services</Text>
       </View>
       <ScrollView className="dark:bg-black">
         <Text className="text-2xl text-center pt-10 dark:text-white">How can we help you?</Text>

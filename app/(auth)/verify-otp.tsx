@@ -227,7 +227,7 @@ const VerifyOtp = () => {
 
     return (
         <SafeAreaView className="flex-1 bg-white pb-6">
-            <View className="px-6 py-4 mt-[0px]">
+            <View className="px-6 py-4 mt-[5px]">
                 <TouchableOpacity onPress={() => router.back()}>
                     <Feather name="arrow-left" size={24} color="gray" />
                 </TouchableOpacity>

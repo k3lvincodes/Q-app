@@ -190,26 +190,26 @@ const DepositModal = ({ modalVisible, setModalVisible }: ModalType) => {
 
     return (
       <Pressable className="bg-white rounded-xl px-5 w-full mx-5 py-10" onPress={() => { }}>
-        <Text className="font-bold text-3xl">Deposit</Text>
+        <Text className="font-bold text-[24px]">Deposit</Text>
         <Text className="text-gray-500 pt-2">
           Withdrawals are not supported only deposit the money you need for a subscription.
         </Text>
         <TextInput
-          className="border h-[3.5rem] pl-3 border-gray-300 rounded mt-10"
+          className="border h-[48px] pl-3 border-gray-300 rounded mt-10"
           placeholder="Enter amount"
           keyboardType="numeric"
           value={amount}
           onChangeText={setAmount}
         />
         <Pressable
-          className="bg-bg mt-5 self-start rounded-full py-5 px-10 flex-row justify-center items-center"
+          className="bg-bg mt-5 self-start rounded-full h-[44px] w-[94px] flex-row justify-center items-center"
           onPress={handleDeposit}
           disabled={loading}
         >
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text className="text-white font-bold">Deposit</Text>
+            <Text className="text-white font-bold text-[14px]">Deposit</Text>
           )}
         </Pressable>
       </Pressable>

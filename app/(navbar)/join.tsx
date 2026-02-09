@@ -145,7 +145,7 @@ const Join = () => {
   return (
     <SafeAreaView className="flex-1 bg-[#F6F4F1] dark:bg-black">
       <ScrollView className="px-5">
-        <View className="flex-row pb-6 items-center gap-5 mt-[0px]">
+        <View className="flex-row pb-6 items-center gap-5 mt-[5px]">
           <TouchableOpacity onPress={() => router.back()}>
             <Arrow />
           </TouchableOpacity>

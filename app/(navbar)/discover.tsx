@@ -54,11 +54,11 @@ const Discover = () => {
 
   return (
     <SafeAreaView className="px-5 h-full dark:bg-black">
-      <View className="flex-row items-center gap-5 mt-[0px]">
+      <View className="flex-row items-center gap-5 mt-[5px]">
         <TouchableOpacity onPress={() => router.back()}>
           <Arrow />
         </TouchableOpacity>
-        <Text className="text-bg text-xl ">Services</Text>
+        <Text className="text-bg text-[14px] ">Services</Text>
       </View>
 
       <Subscription services={services} />

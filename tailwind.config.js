@@ -15,7 +15,9 @@ module.exports = {
         helvetica: ['Helvetica', 'sans-serif'],
         'helvetica-bold': ['Helvetica-Bold', 'sans-serif'],
         segoe: ['"Segoe UI"', 'sans-serif'],
-        'segoe-bold': ['"Segoe UI"', 'sans-serif'], // Assuming bold is handled by font-weight or system fallback
+        'segoe-bold': ['"Segoe UI"', 'sans-serif'],
+        salsa: ['Salsa-Regular', 'cursive'],
+        gilroy: ['Gilroy-Regular', 'sans-serif'],
       },
     },
   },

@@ -79,11 +79,11 @@ const Profile = () => {
 
   return (
     <SafeAreaView className='flex-1 dark:bg-black'>
-      <View className="flex-row items-center gap-5 px-5 mt-[0px]">
+      <View className="flex-row items-center gap-5 px-5 mt-[5px]">
         <TouchableOpacity onPress={() => router.back()}>
           <Arrow />
         </TouchableOpacity>
-        <Text className="text-bg text-xl ">Profile</Text>
+        <Text className="text-bg text-[14px] ">Profile</Text>
       </View>
       <ScrollView className='px-5 pt-5 pb-400 h-full '>
         <User user={user} onUpdate={handleUpdateProfile} />

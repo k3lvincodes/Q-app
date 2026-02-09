@@ -125,12 +125,12 @@ const Notification = () => {
   return (
     <SafeAreaView className="flex-1 bg-[#F6F4F1] dark:bg-black">
       {/* Header */}
-      <View className="flex-row items-center justify-between px-5 pb-4 mt-[0px]">
+      <View className="flex-row items-center justify-between px-5 pb-4 mt-[5px]">
         <View className="flex-row items-center gap-5">
           <TouchableOpacity onPress={() => router.back()}>
             <Arrow />
           </TouchableOpacity>
-          <Text className="text-[#1E293B] dark:text-gray-200 text-xl font-bold">Notifications</Text>
+          <Text className="text-[#1E293B] dark:text-gray-200 text-[14px] font-bold">Notifications</Text>
         </View>
         {unreadCount > 0 && (
           <TouchableOpacity onPress={handleMarkAllRead}>

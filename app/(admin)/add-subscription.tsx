@@ -265,7 +265,7 @@ const AddSubscription = () => {
             />
 
             {/* Header */}
-            <View className="px-6 py-4 mt-[0px] flex-row justify-between items-center bg-white">
+            <View className="px-6 py-4 mt-[5px] flex-row justify-between items-center bg-white">
                 <View className="flex-row items-center gap-2">
                     <Logo width={35} height={35} />
                     <Text className="text-xl font-bold tracking-tighter">jointheQ</Text>

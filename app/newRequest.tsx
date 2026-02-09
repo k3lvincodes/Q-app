@@ -47,11 +47,11 @@ const NewRequest = () => {
 
   return (
     <SafeAreaView className="px-5 bg-[#F6F4F1] dark:bg-black h-full">
-      <View className="flex-row items-center gap-5 mt-[0px]">
+      <View className="flex-row items-center gap-5 mt-[5px]">
         <TouchableOpacity onPress={() => router.back()}>
           <Arrow />
         </TouchableOpacity>
-        <Text className="text-bg text-xl ">New request</Text>
+        <Text className="text-bg text-[14px] ">New request</Text>
       </View>
       <View className="gap-5 pt-10">
         <View className="gap-3">

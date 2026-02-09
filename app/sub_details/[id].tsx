@@ -145,7 +145,7 @@ const SubDetail = () => {
           resizeMode="cover"
         />
       )}
-      <Text className="text-center pb-10 font-semibold mt-[0px] text-xl dark:text-white">
+      <Text className="text-center pb-10 font-semibold mt-[5px] text-xl dark:text-white">
         {subscription.name} by JointheQ
       </Text>
       <FlatList

@@ -30,14 +30,14 @@ const Transactions = ({ transactions }: TransactionsProps) => {
   return (
     <View className='pt-8'>
       <View className='flex-row justify-between items-center mb-4'>
-        <Text className='font-bold text-lg text-[#1E293B] dark:text-white'>Recent Transactions</Text>
-        <Link href={'/transactions'} className='text-[#EF5323] font-medium text-base'>View all</Link>
+        <Text className='font-bold text-[14px] text-[#1E293B] dark:text-white'>Recent Transactions</Text>
+        <Link href={'/transactions'} className='text-[#EF5323] font-medium text-[14px]'>View all</Link>
       </View>
       {transactions && transactions.length > 0 ? (
         transactions.slice(0, 3).map((tx) => (
           <View key={tx.id} className='flex-row justify-between items-center py-3 border-b border-gray-100 dark:border-gray-800'>
             <View className='flex-1'>
-              <Text className={`font-semibold ${tx.type === 'credit' ? 'text-green-600' : 'text-red-500'}`}>
+              <Text className={`font-semibold text-[12px] ${tx.type === 'credit' ? 'text-green-600' : 'text-red-500'}`}>
                 {tx.type === 'credit' ? '+ ' : '- '}₦{tx.amount.toLocaleString()}
               </Text>
               {tx.description && (
@@ -49,7 +49,7 @@ const Transactions = ({ transactions }: TransactionsProps) => {
           </View>
         ))
       ) : (
-        <Text className='pt-2 text-[#64748B]'>No Recent Transactions</Text>
+        <Text className='pt-2 text-[#64748B] text-[12px]'>No Recent Transactions</Text>
       )}
     </View>
   )

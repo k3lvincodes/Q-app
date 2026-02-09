@@ -160,7 +160,7 @@ const Support = () => {
 
     return (
         <SafeAreaView className="flex-1 bg-[#F6F4F1] dark:bg-black">
-            <View className="flex-row items-center gap-5 px-5 mt-[0px] mb-5">
+            <View className="flex-row items-center gap-5 px-5 mt-[5px] mb-5">
                 <TouchableOpacity onPress={() => router.back()}>
                     <Arrow />
                 </TouchableOpacity>

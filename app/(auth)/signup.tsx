@@ -90,7 +90,7 @@ const Signup = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <View className="px-6 py-4 mt-[0px] flex-row items-center gap-2">
+      <View className="px-6 py-4 mt-[5px] flex-row items-center gap-2">
         <Logo width={35} height={35} />
         <Text className="text-xl font-bold tracking-tighter">jointheQ</Text>
       </View>

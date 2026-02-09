@@ -110,11 +110,11 @@ const Transactions = () => {
     return (
         <SafeAreaView className="flex-1 bg-[#F6F4F1] dark:bg-black">
             {/* Header */}
-            <View className="flex-row items-center gap-5 px-5 pb-4 mt-[0px]">
+            <View className="flex-row items-center gap-5 px-5 pb-4 mt-[5px]">
                 <TouchableOpacity onPress={() => router.back()}>
                     <Arrow />
                 </TouchableOpacity>
-                <Text className="text-[#1E293B] dark:text-gray-200 text-xl font-bold">All Transactions</Text>
+                <Text className="text-[#1E293B] dark:text-gray-200 text-[14px] font-bold">All Transactions</Text>
             </View>
 
             {/* Balance Summary */}
