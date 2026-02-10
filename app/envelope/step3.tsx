@@ -1,78 +1,120 @@
+import UserMenu from "@/components/User/UserMenu";
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React from 'react';
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Platform, Pressable, ScrollView, Text, TextInput, ToastAndroid, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import NotificationIcon from "../../assets/svg/nortification.svg";
 
 export default function EnvelopeStep3() {
+    const [unlockPassword, setUnlockPassword] = useState('');
+    const [menuVisible, setMenuVisible] = useState(false);
+    const link = "https://jointheQ/qenvelop.ng";
+
+    const copyToClipboard = () => {
+        // Since expo-clipboard is not installed, we'll simulate it for now or use Clipboard from react-native if available (deprecated)
+        // Or just show a toast for visual confirmation as requested in plan
+        if (Platform.OS === 'android') {
+            ToastAndroid.show('Link copied to clipboard', ToastAndroid.SHORT);
+        }
+    };
+
     return (
         <SafeAreaView className="flex-1 bg-[#F6F4F1] dark:bg-black">
+            {/* Dim overlay when menu is open */}
+            {menuVisible && (
+                <Pressable
+                    className="absolute top-0 bottom-0 left-0 right-0 bg-black/20 z-50"
+                    onPress={() => setMenuVisible(false)}
+                />
+            )}
+
+            <UserMenu
+                visible={menuVisible}
+                onClose={() => setMenuVisible(false)}
+            />
+
             {/* Header */}
-            <View className="flex-row items-center justify-between px-5 mt-[5px]">
-                <TouchableOpacity onPress={() => router.back()} className="p-2 bg-white rounded-full">
+            <View className="flex-row items-center justify-between px-5 mt-[5px] mb-6">
+                <TouchableOpacity
+                    onPress={() => router.back()}
+                    className="w-12 h-12 bg-white rounded-full justify-center items-center shadow-sm shadow-gray-200"
+                >
                     <Ionicons name="arrow-back" size={24} color="#EF5323" />
                 </TouchableOpacity>
-                <Text className="text-[16px] font-segoe dark:text-white">Review Envelope</Text>
-                <TouchableOpacity onPress={() => { }} className="p-2 bg-white rounded-full">
-                    <Ionicons name="notifications-outline" size={24} color="#EF5323" />
+                <Text className="text-[16px] font-segoe dark:text-white">Step 3 of 3</Text>
+                <TouchableOpacity
+                    onPress={() => router.push('/notification')}
+                    className="w-12 h-12 bg-white rounded-full justify-center items-center shadow-sm shadow-gray-200"
+                >
+                    <NotificationIcon width={24} height={24} />
                 </TouchableOpacity>
             </View>
+
             <ScrollView className="flex-1 px-5">
 
-                <View className="mt-6 items-center">
-                    <View className="bg-[#991B1B] w-full rounded-[30px] p-8 items-center relative overflow-hidden shadow-xl shadow-red-900/40">
-                        {/* Background Hearts Pattern (Reused from Dashboard) */}
-                        <View className="absolute -left-4 -top-8 opacity-40 transform -rotate-12">
-                            <Ionicons name="heart-outline" size={90} color="white" />
-                        </View>
-                        <View className="absolute right-4 -bottom-8 opacity-40 transform -rotate-45">
-                            <Ionicons name="heart-outline" size={70} color="white" />
-                        </View>
-
-                        <Text className="text-white/80 font-segoe mb-2">Sending to</Text>
-                        <Text className="text-white text-3xl font-bold font-segoe mb-8">Recipient Name</Text>
-
-                        <View className="bg-white/20 px-6 py-3 rounded-full backdrop-blur-md mb-8">
-                            <Text className="text-white font-bold text-xl">₦5,000</Text>
-                        </View>
-
-                        <Text className="text-white/80 font-segoe mb-2">Message</Text>
-                        <Text className="text-white font-serif italic text-center px-4">
-                            "This is a digital envelope sent with love. Hope you enjoy it!"
-                        </Text>
-                    </View>
+                {/* Unlock Password Section */}
+                <View className="mb-8">
+                    <Text className="text-[#1E1E1E] dark:text-gray-300 mb-2 font-segoe text-[16px]">Unlock password (secret answer)</Text>
+                    <TextInput
+                        className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl h-[48px] px-4 text-black dark:text-white font-segoe"
+                        placeholder="Enter password"
+                        placeholderTextColor="#9CA3AF"
+                        value={unlockPassword}
+                        onChangeText={setUnlockPassword}
+                    />
+                    <Text className="text-[#1E1E1E] text-xs font-segoe mt-2">only the recipient who knows this can open it.</Text>
                 </View>
 
-                <View className="mt-8 space-y-4">
-                    <View className="flex-row justify-between items-center bg-white dark:bg-gray-900 p-4 rounded-xl">
-                        <Text className="text-gray-500 dark:text-gray-400">Gift Value</Text>
-                        <Text className="text-black dark:text-white font-bold">₦5,000</Text>
-                    </View>
-                    <View className="flex-row justify-between items-center bg-white dark:bg-gray-900 p-4 rounded-xl">
-                        <Text className="text-gray-500 dark:text-gray-400">Service Fee</Text>
-                        <Text className="text-black dark:text-white font-bold">₦100</Text>
-                    </View>
-                    <View className="flex-row justify-between items-center bg-white dark:bg-gray-900 p-4 rounded-xl border border-[#EF5323]">
-                        <Text className="text-[#EF5323] font-bold">Total to Pay</Text>
-                        <Text className="text-[#EF5323] font-bold text-xl">₦5,100</Text>
-                    </View>
+                {/* Summary Card */}
+                <View className="bg-black dark:bg-white w-full rounded-[20px] p-6 mb-8 shadow-xl shadow-black/20">
+                    <Text className="text-white dark:text-black text-[16px] font-segoe mb-1">To: mine</Text>
+                    <Text className="text-white dark:text-black text-[18px] font-bold font-segoe mb-4">Q Envelope</Text>
+
+                    <Text className="text-white dark:text-black text-[14px] font-segoe mb-4 leading-5">
+                        Gift: Digital flower• ₦5,000 (+₦100 fee) • Total ₦5,100
+                    </Text>
+
+                    <Text className="text-white dark:text-black text-[14px] font-segoe mb-4 leading-5">
+                        Happy Valentine, my person 🤍 I wrapped this in a Q Envelope because you deserve soft surprises. Open it with the secret answer, and know it’s from me.
+                    </Text>
+
+                    <Text className="text-white dark:text-black text-[14px] font-segoe">
+                        Delivery: WhatsApp • On Valentine
+                    </Text>
                 </View>
 
-                {/* Pay Button */}
-                <View className="mt-10 mb-10">
+                {/* Link Section */}
+                <View className="bg-black w-full h-[60px] rounded-[12px] flex-row items-center justify-between px-4 mb-8">
+                    <Text className="text-white text-[14px] font-segoe truncate mr-2 flex-1" numberOfLines={1}>
+                        {link}
+                    </Text>
                     <TouchableOpacity
-                        className="bg-black dark:bg-white w-full py-4 rounded-xl flex-row justify-center items-center shadow-lg shadow-black/20"
-                        onPress={() => {
-                            // Here we would handle payment logic
-                            // For now we just go back to dashboard
-                            router.push('/(navbar)/dashboard');
-                        }}
+                        className="bg-[#666666] px-4 py-2 rounded-[6px]"
+                        onPress={copyToClipboard}
                     >
-                        <Text className="text-white dark:text-black font-bold text-lg font-segoe">Pay & Send Envelope</Text>
-                        <Ionicons name="paper-plane-outline" size={20} color="white" style={{ marginLeft: 8 }} />
+                        <Text className="text-white text-[14px] font-segoe">Copy</Text>
                     </TouchableOpacity>
                 </View>
 
             </ScrollView>
+
+            {/* Footer Section - Outside ScrollView */}
+            <View className="px-5 pb-5 pt-2 bg-[#F6F4F1] dark:bg-black">
+                {/* Finish Button */}
+                <TouchableOpacity
+                    className="bg-black dark:bg-white w-full h-[48px] justify-center rounded-xl flex-row items-center shadow-lg shadow-black/20"
+                    onPress={() => router.push('/(navbar)/dashboard')}
+                >
+                    <Text className="text-white dark:text-black font-bold text-lg font-segoe">Finish</Text>
+                </TouchableOpacity>
+
+                {/* Footer Text */}
+                <View className="w-full items-center pt-4">
+                    <Text className="text-gray-400 text-xs">Made with care by Q · Share smarter. Spend less.</Text>
+                </View>
+            </View>
+
         </SafeAreaView>
     );
 }

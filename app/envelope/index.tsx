@@ -1,7 +1,8 @@
+import UserMenu from "@/components/User/UserMenu";
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useEffect } from 'react';
-import { Dimensions, Platform, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, Platform, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
     Easing,
     FadeInDown,
@@ -13,6 +14,7 @@ import Animated, {
     withTiming
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import NotificationIcon from "../../assets/svg/nortification.svg";
 
 const { height } = Dimensions.get('window');
 
@@ -40,6 +42,7 @@ export default function EnvelopeLanding() {
     const floatY = useSharedValue(0);
     const pulse = useSharedValue(1);
     const insets = useSafeAreaInsets();
+    const [menuVisible, setMenuVisible] = useState(false);
 
     useEffect(() => {
         // Floating animation
@@ -96,6 +99,19 @@ export default function EnvelopeLanding() {
 
     return (
         <View className="flex-1 bg-black">
+            {/* Dim overlay when menu is open */}
+            {menuVisible && (
+                <Pressable
+                    className="absolute top-0 bottom-0 left-0 right-0 bg-black/20 z-50"
+                    onPress={() => setMenuVisible(false)}
+                />
+            )}
+
+            <UserMenu
+                visible={menuVisible}
+                onClose={() => setMenuVisible(false)}
+            />
+
             {/* Intro Overlay */}
             <Animated.View style={introStyle}>
                 <View className="flex-1 items-center justify-center overflow-hidden">
@@ -140,11 +156,17 @@ export default function EnvelopeLanding() {
                 >
                     {/* Header Icons */}
                     <View className="w-full flex-row justify-between items-center">
-                        <TouchableOpacity onPress={() => router.back()} className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full justify-center items-center border border-white/30">
-                            <Ionicons name="menu-outline" size={24} color="white" />
+                        <TouchableOpacity
+                            onPress={() => router.back()}
+                            className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full justify-center items-center border border-white/30"
+                        >
+                            <Ionicons name="arrow-back" size={24} color="white" />
                         </TouchableOpacity>
-                        <TouchableOpacity className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full justify-center items-center border border-white/30">
-                            <Ionicons name="notifications-outline" size={24} color="white" />
+                        <TouchableOpacity
+                            onPress={() => router.push('/notification')}
+                            className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full justify-center items-center border border-white/30"
+                        >
+                            <NotificationIcon width={24} height={24} />
                         </TouchableOpacity>
                     </View>
 

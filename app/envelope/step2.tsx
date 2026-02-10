@@ -2,16 +2,20 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View, useColorScheme } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const sendViaData = [
-    { label: "What's app", value: 'whatsapp' },
+    { label: "WhatsApp", value: 'whatsapp' },
     { label: 'Email', value: 'email' },
     { label: 'SMS', value: 'sms' },
 ];
 
 export default function EnvelopeStep2() {
+    const colorScheme = useColorScheme();
+    const isDark = colorScheme === 'dark';
+
     const [recipientName, setRecipientName] = useState('');
     const [sendVia, setSendVia] = useState('whatsapp');
     const [contactInfo, setContactInfo] = useState('');
@@ -46,13 +50,13 @@ export default function EnvelopeStep2() {
                 <ScrollView className="flex-1 px-5">
 
                     {/* Form */}
-                    <View className="mt-6 space-y-6">
+                    <View className="mt-[41px]">
 
                         {/* Recipient Name */}
-                        <View>
-                            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">Recipient name</Text>
+                        <View className="mb-[10px]">
+                            <Text className="text-gray-700 dark:text-gray-300 mb-[5px] font-segoe text-[16px]">Recipient name</Text>
                             <TextInput
-                                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 text-black dark:text-white font-segoe"
+                                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl h-[48px] px-4 text-black dark:text-white font-segoe"
                                 placeholder="Enter Recipient name"
                                 placeholderTextColor="#9CA3AF"
                                 value={recipientName}
@@ -61,21 +65,29 @@ export default function EnvelopeStep2() {
                         </View>
 
                         {/* Send Via */}
-                        <View>
+                        <View className="mb-6">
                             <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">Send via</Text>
                             <Dropdown
                                 style={{
-                                    height: 56,
-                                    backgroundColor: 'white', // or dark:bg-gray-900
-                                    borderColor: '#E5E7EB', // gray-200
+                                    height: 48,
+                                    backgroundColor: isDark ? '#111827' : 'white', // dark:bg-gray-900
+                                    borderColor: isDark ? '#1F2937' : '#E5E7EB', // dark:border-gray-800 : gray-200
                                     borderWidth: 1,
                                     borderRadius: 12,
                                     paddingHorizontal: 16,
                                 }}
                                 placeholderStyle={{ color: '#9CA3AF', fontSize: 14 }}
-                                selectedTextStyle={{ color: 'black', fontSize: 14 }}
+                                selectedTextStyle={{ color: isDark ? 'white' : 'black', fontSize: 14 }}
                                 inputSearchStyle={{ height: 40, fontSize: 16 }}
                                 iconStyle={{ width: 20, height: 20 }}
+                                iconColor={isDark ? '#9CA3AF' : 'gray'}
+                                containerStyle={{
+                                    backgroundColor: isDark ? '#111827' : 'white',
+                                    borderColor: isDark ? '#1F2937' : '#E5E7EB',
+                                    borderRadius: 12,
+                                }}
+                                itemTextStyle={{ color: isDark ? 'white' : 'black' }}
+                                activeColor={isDark ? '#374151' : '#F3F4F6'} // dark:bg-gray-700 : bg-gray-100
                                 data={sendViaData}
                                 search={false}
                                 maxHeight={300}
@@ -93,11 +105,11 @@ export default function EnvelopeStep2() {
                         </View>
 
                         {/* Phone or Email */}
-                        <View>
-                            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">Phone or email</Text>
+                        <View className="mb-6">
+                            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">Receiver phone or email</Text>
                             <TextInput
-                                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 text-black dark:text-white font-segoe"
-                                placeholder="Enter Recipient Phone or email"
+                                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl h-[48px] px-4 text-black dark:text-white font-segoe"
+                                placeholder="Enter Receiver phone or email"
                                 placeholderTextColor="#9CA3AF"
                                 value={contactInfo}
                                 onChangeText={setContactInfo}
@@ -105,10 +117,10 @@ export default function EnvelopeStep2() {
                         </View>
 
                         {/* Deliver Date */}
-                        <View>
-                            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">Deliver</Text>
+                        <View className="mb-6">
+                            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">Delivery day</Text>
                             <TouchableOpacity
-                                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 flex-row justify-between items-center"
+                                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl h-[48px] px-4 flex-row justify-between items-center"
                                 onPress={() => setShowDatePicker(true)}
                             >
                                 <Text className={`font-segoe ${date ? 'text-black dark:text-white' : 'text-gray-400'}`}>
@@ -122,16 +134,17 @@ export default function EnvelopeStep2() {
                                     value={date}
                                     mode="date"
                                     is24Hour={true}
+                                    minimumDate={new Date(new Date().setHours(0, 0, 0, 0))}
                                     onChange={onDateChange}
                                 />
                             )}
                         </View>
 
                         {/* Unlock Hint */}
-                        <View>
+                        <View className="mb-6">
                             <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">Unlock hint (optional)</Text>
                             <TextInput
-                                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4 text-black dark:text-white font-segoe"
+                                className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl h-[48px] px-4 text-black dark:text-white font-segoe"
                                 placeholder="E.g the name you call me when i am happy"
                                 placeholderTextColor="#9CA3AF"
                                 value={unlockHint}
@@ -139,21 +152,24 @@ export default function EnvelopeStep2() {
                             />
                         </View>
 
-                        {/* Continue Button */}
-                        <TouchableOpacity
-                            className="bg-black dark:bg-white w-full py-4 rounded-xl flex-row justify-center items-center mt-6 shadow-lg shadow-black/20"
-                            onPress={() => router.push('/envelope/step3')}
-                        >
-                            <Text className="text-white dark:text-black font-bold text-lg font-segoe">Continue</Text>
-                        </TouchableOpacity>
-
-                        {/* Footer */}
-                        <View className="w-full items-center py-6">
-                            <Text className="text-gray-400 text-xs">Made with care by Q · Share smarter. Spend less.</Text>
-                        </View>
-
                     </View>
                 </ScrollView>
+
+                {/* Footer Section - Outside ScrollView */}
+                <View className="px-5 pb-5 pt-[10px] bg-[#F6F4F1] dark:bg-black">
+                    {/* Continue Button */}
+                    <TouchableOpacity
+                        className="bg-black dark:bg-white w-full h-[48px] justify-center rounded-xl flex-row items-center shadow-lg shadow-black/20"
+                        onPress={() => router.push('/envelope/step3')}
+                    >
+                        <Text className="text-white dark:text-black font-bold text-lg font-segoe">Continue</Text>
+                    </TouchableOpacity>
+
+                    {/* Footer Text */}
+                    <View className="w-full items-center pt-4">
+                        <Text className="text-gray-400 text-xs">Made with care by Q · Share smarter. Spend less.</Text>
+                    </View>
+                </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
