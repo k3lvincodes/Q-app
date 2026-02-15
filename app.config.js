@@ -11,7 +11,10 @@ export default {
         userInterfaceStyle: "automatic",
         newArchEnabled: true,
         ios: {
-            supportsTablet: true
+            supportsTablet: true,
+            infoPlist: {
+                NSFaceIDUsageDescription: "Allow JoinQ to use Face ID for secure access."
+            }
         },
         android: {
             adaptiveIcon: {
@@ -22,7 +25,8 @@ export default {
             },
             edgeToEdgeEnabled: false,
             predictiveBackGestureEnabled: false,
-            package: "com.k3boys.qmobile"
+            package: "com.k3boys.qmobile",
+            windowSoftInputMode: "adjustResize"
         },
         web: {
             output: "static",
@@ -40,6 +44,12 @@ export default {
                     dark: {
                         backgroundColor: "#000000"
                     }
+                }
+            ],
+            [
+                "expo-local-authentication",
+                {
+                    "faceIDPermission": "Allow JoinQ to use Face ID for secure access."
                 }
             ],
             "expo-secure-store"

@@ -98,7 +98,8 @@ const index = () => {
             if (hasHardware && isEnrolled) {
               const result = await LocalAuthentication.authenticateAsync({
                 promptMessage: 'Welcome back',
-                fallbackLabel: 'Use Passcode',
+                disableDeviceFallback: true,
+                cancelLabel: 'Cancel',
               });
 
               if (result.success) {

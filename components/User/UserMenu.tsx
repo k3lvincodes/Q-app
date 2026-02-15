@@ -54,7 +54,7 @@ const UserMenu = ({ visible, onClose, onRefresh }: UserMenuProps) => {
 
     return (
         <Animated.View
-            style={[styles.container, animatedStyle, { top: insets.top + 15 }]}
+            style={[styles.container, animatedStyle, { top: insets.top + 60 }]}
             pointerEvents={visible ? 'auto' : 'none'}
         >
             <View className="flex-1 bg-[#F6F4F1] rounded-[6px] overflow-hidden justify-center">
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
         top: 0,
         left: 16,
         height: 291,
-        width: 240,
+        width: 200,
         backgroundColor: 'transparent', // The internal view handles background and radius
         zIndex: 1000,
         shadowColor: "#000",

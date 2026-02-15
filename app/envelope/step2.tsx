@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View, useColorScheme } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -15,6 +15,7 @@ const sendViaData = [
 export default function EnvelopeStep2() {
     const colorScheme = useColorScheme();
     const isDark = colorScheme === 'dark';
+    const params = useLocalSearchParams();
 
     const [recipientName, setRecipientName] = useState('');
     const [sendVia, setSendVia] = useState('whatsapp');
@@ -30,6 +31,8 @@ export default function EnvelopeStep2() {
             setDate(selectedDate);
         }
     };
+
+    const canProceed = recipientName.trim().length > 0 && contactInfo.trim().length > 0 && sendVia.length > 0 && date !== null;
 
     return (
         <SafeAreaView className="flex-1 bg-[#F6F4F1] dark:bg-black">
@@ -106,11 +109,14 @@ export default function EnvelopeStep2() {
 
                         {/* Phone or Email */}
                         <View className="mb-6">
-                            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">Receiver phone or email</Text>
+                            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">
+                                {sendVia === 'whatsapp' ? 'Receiver WhatsApp Number' : sendVia === 'email' ? 'Receiver Email' : 'Receiver Phone Number'}
+                            </Text>
                             <TextInput
                                 className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl h-[48px] px-4 text-black dark:text-white font-segoe"
-                                placeholder="Enter Receiver phone or email"
+                                placeholder={sendVia === 'whatsapp' ? 'Enter receiver WhatsApp number' : sendVia === 'email' ? 'Enter receiver email address' : 'Enter receiver phone number'}
                                 placeholderTextColor="#9CA3AF"
+                                keyboardType={sendVia === 'email' ? 'email-address' : 'phone-pad'}
                                 value={contactInfo}
                                 onChangeText={setContactInfo}
                             />
@@ -159,10 +165,30 @@ export default function EnvelopeStep2() {
                 <View className="px-5 pb-5 pt-[10px] bg-[#F6F4F1] dark:bg-black">
                     {/* Continue Button */}
                     <TouchableOpacity
-                        className="bg-black dark:bg-white w-full h-[48px] justify-center rounded-xl flex-row items-center shadow-lg shadow-black/20"
-                        onPress={() => router.push('/envelope/step3')}
+                        className={`w-full h-[48px] justify-center rounded-xl flex-row items-center shadow-lg ${canProceed ? 'bg-black dark:bg-white shadow-black/20' : 'bg-gray-400 shadow-gray-400/20'}`}
+                        onPress={() => router.push({
+                            pathname: '/envelope/step3',
+                            params: {
+                                // Forward step 1 data
+                                senderName: params.senderName,
+                                giftType: params.giftType,
+                                giftPrice: params.giftPrice,
+                                message: params.message,
+                                fee: params.fee,
+                                totalCharge: params.totalCharge,
+                                recipientAmount: params.recipientAmount,
+                                feeDeductedFromGift: params.feeDeductedFromGift,
+                                // Step 2 data
+                                recipientName,
+                                sendVia,
+                                contactInfo,
+                                deliveryDate: date.toDateString(),
+                                unlockHint,
+                            }
+                        })}
+                        disabled={!canProceed}
                     >
-                        <Text className="text-white dark:text-black font-bold text-lg font-segoe">Continue</Text>
+                        <Text className={`font-bold text-lg font-segoe ${canProceed ? 'text-white dark:text-black' : 'text-gray-200'}`}>Continue</Text>
                     </TouchableOpacity>
 
                     {/* Footer Text */}

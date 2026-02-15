@@ -51,7 +51,8 @@ export default function RootLayout() {
                 if (hasHardware && isEnrolled) {
                   const result = await LocalAuthentication.authenticateAsync({
                     promptMessage: 'Session Locked due to inactivity',
-                    fallbackLabel: 'Use Passcode',
+                    disableDeviceFallback: true,
+                    cancelLabel: 'Logout',
                   });
 
                   if (!result.success) {

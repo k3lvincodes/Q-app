@@ -19,7 +19,24 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:3001',
+  'https://joinq.ng',
+  'http://localhost:8081', // Internal App Dev
+  'http://localhost:3000' // Self
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}));
 app.use(express.json());
 
 app.get('/', (req: Request, res: Response) => {

@@ -1,5 +1,5 @@
 
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { Link, router } from "expo-router";
 import * as SecureStore from 'expo-secure-store';
@@ -26,6 +26,7 @@ const Login = () => {
   const [emailError, setEmailError] = useState("");
   const [countdown, setCountdown] = useState(0);
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
+  const [biometricType, setBiometricType] = useState<LocalAuthentication.AuthenticationType | null>(null);
 
 
   const [loading, setLoading] = useState(false);
@@ -90,6 +91,15 @@ const Login = () => {
 
         setIsBiometricSupported(true);
 
+        const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+        if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
+          setBiometricType(LocalAuthentication.AuthenticationType.FINGERPRINT);
+        } else if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
+          setBiometricType(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION);
+        } else if (types.includes(LocalAuthentication.AuthenticationType.IRIS)) {
+          setBiometricType(LocalAuthentication.AuthenticationType.IRIS);
+        }
+
         if (session) {
           const result = await LocalAuthentication.authenticateAsync({
             promptMessage: 'Login with Biometrics',
@@ -124,8 +134,9 @@ const Login = () => {
           }
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log('Biometric error:', error);
+      // Alert.alert('Biometric Error', error.message); // Optional: checking startup error
     }
   };
 
@@ -136,7 +147,9 @@ const Login = () => {
     try {
       const result = await LocalAuthentication.authenticateAsync({
         promptMessage: 'Login with Biometrics',
-        fallbackLabel: 'Use Passcode',
+        fallbackLabel: '',
+        disableDeviceFallback: true,
+        cancelLabel: 'Cancel',
       });
 
       if (result.success) {
@@ -182,8 +195,10 @@ const Login = () => {
         } else {
           setEmailError('No saved session. Please login with email.');
         }
+      } else {
+        // Alert if failed (e.g. cancelled or no match)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log('Biometric manual auth error:', error);
       setEmailError('Biometric authentication failed.');
     }
@@ -294,7 +309,11 @@ const Login = () => {
 
           {isBiometricSupported && (
             <TouchableOpacity onPress={handleBiometricAuth} className="items-center mt-[50px]">
-              <Ionicons name="finger-print" size={60} color="#EF4444" />
+              {biometricType === LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION ? (
+                <MaterialCommunityIcons name="face-recognition" size={60} color="#EF4444" />
+              ) : (
+                <Ionicons name="finger-print" size={60} color="#EF4444" />
+              )}
             </TouchableOpacity>
           )}
         </View>

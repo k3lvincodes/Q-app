@@ -1,4 +1,4 @@
-import { Feather } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { Stack, router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -13,6 +13,7 @@ const Settings = () => {
     const [menuVisible, setMenuVisible] = useState(false);
     const [biometricEnabled, setBiometricEnabled] = useState(false);
     const [isSupported, setIsSupported] = useState(false);
+    const [biometricType, setBiometricType] = useState<LocalAuthentication.AuthenticationType | null>(null);
 
     useEffect(() => {
         checkSupport();
@@ -23,6 +24,17 @@ const Settings = () => {
         const compatible = await LocalAuthentication.hasHardwareAsync();
         const enrolled = await LocalAuthentication.isEnrolledAsync();
         setIsSupported(compatible && enrolled);
+
+        if (compatible) {
+            const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+            if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
+                setBiometricType(LocalAuthentication.AuthenticationType.FINGERPRINT);
+            } else if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
+                setBiometricType(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION);
+            } else if (types.includes(LocalAuthentication.AuthenticationType.IRIS)) {
+                setBiometricType(LocalAuthentication.AuthenticationType.IRIS);
+            }
+        }
     };
 
     const checkStatus = async () => {
@@ -40,6 +52,8 @@ const Settings = () => {
         if (value) {
             const result = await LocalAuthentication.authenticateAsync({
                 promptMessage: 'Authenticate to enable Biometrics for Admin',
+                disableDeviceFallback: true,
+                cancelLabel: 'Cancel',
             });
             if (result.success) {
                 await SecureStore.setItemAsync('admin_biometric_enabled', 'true');
@@ -95,7 +109,16 @@ const Settings = () => {
                     {/* Biometric Toggle */}
                     {isSupported && (
                         <View className="flex-row items-center justify-between mb-4">
-                            <Text className="text-[#E85D36] text-lg font-segoe font-medium">Biometric Login</Text>
+                            <View className="flex-row gap-2 items-center">
+                                <MaterialCommunityIcons
+                                    name={biometricType === LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION ? "face-recognition" : "fingerprint"}
+                                    size={24}
+                                    color="#E85D36"
+                                />
+                                <Text className="text-[#E85D36] text-lg font-segoe font-medium">
+                                    {biometricType === LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION ? "Face ID" : "Biometric Login"}
+                                </Text>
+                            </View>
                             <Switch
                                 trackColor={{ false: "#767577", true: "#EB4219" }}
                                 thumbColor={biometricEnabled ? "#fff" : "#f4f3f4"}

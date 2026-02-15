@@ -24,6 +24,7 @@ type ModalType = {
 const AppModal = ({ modalVisible, setModalVisible }: ModalType) => {
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
+  const [biometricType, setBiometricType] = useState<LocalAuthentication.AuthenticationType | null>(null);
   const { colorScheme, setColorScheme } = useColorScheme();
 
   useEffect(() => {
@@ -35,6 +36,17 @@ const AppModal = ({ modalVisible, setModalVisible }: ModalType) => {
     const compatible = await LocalAuthentication.hasHardwareAsync();
     const enrolled = await LocalAuthentication.isEnrolledAsync();
     setIsSupported(compatible && enrolled);
+
+    if (compatible) {
+      const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+      if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
+        setBiometricType(LocalAuthentication.AuthenticationType.FINGERPRINT);
+      } else if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
+        setBiometricType(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION);
+      } else if (types.includes(LocalAuthentication.AuthenticationType.IRIS)) {
+        setBiometricType(LocalAuthentication.AuthenticationType.IRIS);
+      }
+    }
   };
 
   const checkStatus = async () => {
@@ -50,6 +62,8 @@ const AppModal = ({ modalVisible, setModalVisible }: ModalType) => {
     if (value) {
       const result = await LocalAuthentication.authenticateAsync({
         promptMessage: 'Authenticate to enable Biometrics',
+        disableDeviceFallback: true,
+        cancelLabel: 'Cancel',
       });
       if (result.success) {
         await SecureStore.setItemAsync('biometric_enabled', 'true');
@@ -102,8 +116,14 @@ const AppModal = ({ modalVisible, setModalVisible }: ModalType) => {
               {isSupported && (
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row gap-2 items-center">
-                    <MaterialCommunityIcons name="fingerprint" size={24} color="gray" />
-                    <Text className="text-gray-600">Biometric Login</Text>
+                    <MaterialCommunityIcons
+                      name={biometricType === LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION ? "face-recognition" : "fingerprint"}
+                      size={24}
+                      color="gray"
+                    />
+                    <Text className="text-gray-600">
+                      {biometricType === LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION ? "Face ID" : "Biometric Login"}
+                    </Text>
                   </View>
                   <Switch
                     trackColor={{ false: "#767577", true: "#EB4219" }}

@@ -5,8 +5,7 @@ import UserMenu from "@/components/User/UserMenu";
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, BackHandler, Platform, Pressable, Text, ToastAndroid, TouchableOpacity, View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
+import { ActivityIndicator, BackHandler, Platform, Pressable, RefreshControl, ScrollView, Text, ToastAndroid, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Deposit from "../../assets/svg/deposit.svg";
 import HamburgerIcon from "../../assets/svg/hamburger.svg";
@@ -18,6 +17,7 @@ import { supabase } from "../../utils/supabase";
 interface Subscription {
   id: number;
   name: string;
+  image_url?: string;
   slots_available: number;
   price: number;
 }
@@ -39,27 +39,13 @@ const Dashboard = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balance, setBalance] = useState<number>(0);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [backPressedOnce, setBackPressedOnce] = useState(false);
   const [showMoveToQ, setShowMoveToQ] = useState(false); // Default false until we check database
 
-  // Animation for Refresh
-  const translateY = useSharedValue(0);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateY: translateY.value }],
-    };
-  });
-
   const refreshData = useCallback(async () => {
     try {
-      // Create a smooth slide down and up animation
-      translateY.value = withSequence(
-        withTiming(100, { duration: 500 }),
-        withTiming(0, { duration: 500 })
-      );
-
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
@@ -96,6 +82,7 @@ const Dashboard = () => {
       const formattedSubs = subsResponse.data.map((sub: any) => ({
         id: sub.id,
         name: sub.subscription_services?.name || 'Unknown Service',
+        image_url: sub.subscription_services?.image_url,
         slots_available: 0,
         price: 0
       }));
@@ -114,8 +101,14 @@ const Dashboard = () => {
       setError(err as Error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    refreshData();
+  }, [refreshData]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -234,25 +227,27 @@ const Dashboard = () => {
         onRefresh={refreshData}
       />
 
-      {/* Main Content with Animation */}
-      <Animated.ScrollView
+      {/* Main Content with RefreshControl */}
+      <ScrollView
         className="px-5"
         contentContainerStyle={{ paddingBottom: 80 }}
-        style={animatedStyle}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#EF5323"]} />
+        }
       >
         {/* Header */}
         <View className="flex-row justify-between items-center mb-8 mt-[5px]">
           <TouchableOpacity
             onPress={() => setMenuVisible(true)}
-            className="p-3 rounded-full bg-white shadow-sm shadow-gray-200"
+            className="p-3 rounded-full bg-white dark:bg-gray-900 shadow-sm shadow-gray-200 border border-gray-100 dark:border-gray-800"
           >
             <HamburgerIcon width={24} height={24} color="#EF5323" />
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => router.push('/notification')}
-            className="p-3 rounded-full bg-white shadow-sm shadow-gray-200"
+            className="p-3 rounded-full bg-white dark:bg-gray-900 shadow-sm shadow-gray-200 border border-gray-100 dark:border-gray-800"
           >
             <NotificationIcon width={24} height={24} />
           </TouchableOpacity>
@@ -269,7 +264,7 @@ const Dashboard = () => {
         <View className="flex-row gap-5 mb-8 justify-between">
           <TouchableOpacity
             onPress={() => setModalVisible(true)}
-            className="flex-1 flex-row items-center px-6 h-[64px] justify-between bg-white rounded-[30px]"
+            className="flex-1 flex-row items-center px-6 h-[64px] justify-between bg-white dark:bg-gray-900 rounded-[30px] border border-gray-100 dark:border-gray-800"
           >
             <Text className="text-[#EF5323] text-[14px] font-medium">Deposit</Text>
             <View className="bg-transparent rounded-full p-1 border border-[#EF5323] rounded-full">
@@ -278,7 +273,7 @@ const Dashboard = () => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => router.push("/earnings")}
-            className="flex-1 flex-row items-center px-6 h-[64px] justify-between bg-white rounded-[30px]"
+            className="flex-1 flex-row items-center px-6 h-[64px] justify-between bg-white dark:bg-gray-900 rounded-[30px] border border-gray-100 dark:border-gray-800"
           >
             <Text className="text-[#EF5323] text-[14px] font-medium">Earnings</Text>
             <View className="bg-transparent rounded-full p-1">
@@ -363,7 +358,7 @@ const Dashboard = () => {
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}
         />
-      </Animated.ScrollView>
+      </ScrollView>
     </SafeAreaView>
   );
 };

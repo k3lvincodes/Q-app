@@ -1,6 +1,6 @@
 import UserMenu from "@/components/User/UserMenu";
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { Platform, Pressable, ScrollView, Text, TextInput, ToastAndroid, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,6 +10,21 @@ export default function EnvelopeStep3() {
     const [unlockPassword, setUnlockPassword] = useState('');
     const [menuVisible, setMenuVisible] = useState(false);
     const link = "https://jointheQ/qenvelop.ng";
+    const params = useLocalSearchParams();
+
+    const giftLabels: Record<string, string> = {
+        ocean_heart: 'Eternal Ocean Heart',
+        fire_rose: 'Eternal Fire Rose',
+        ring_flames: 'Eternal Ring of Flames',
+        mythic_rose: 'Mythic Eternal Fire Rose',
+        aurora_throne: 'Mythic Eternal Aurora Throne',
+        dragon_love: 'Mythic Dragonbound Love',
+        yinyang_love: 'Yin & Yang Mystic Love',
+    };
+
+    const giftLabel = giftLabels[params.giftType as string] || params.giftType;
+    const sendViaLabels: Record<string, string> = { whatsapp: 'WhatsApp', email: 'Email', sms: 'SMS' };
+    const sendViaLabel = sendViaLabels[params.sendVia as string] || params.sendVia;
 
     const copyToClipboard = () => {
         // Since expo-clipboard is not installed, we'll simulate it for now or use Clipboard from react-native if available (deprecated)
@@ -68,19 +83,19 @@ export default function EnvelopeStep3() {
 
                 {/* Summary Card */}
                 <View className="bg-black dark:bg-white w-full rounded-[20px] p-6 mb-8 shadow-xl shadow-black/20">
-                    <Text className="text-white dark:text-black text-[16px] font-segoe mb-1">To: mine</Text>
+                    <Text className="text-white dark:text-black text-[16px] font-segoe mb-1">To: {params.recipientName}</Text>
                     <Text className="text-white dark:text-black text-[18px] font-bold font-segoe mb-4">Q Envelope</Text>
 
                     <Text className="text-white dark:text-black text-[14px] font-segoe mb-4 leading-5">
-                        Gift: Digital flower• ₦5,000 (+₦100 fee) • Total ₦5,100
+                        Gift: {giftLabel} • ₦{Number(params.giftPrice).toLocaleString()} (+₦{Number(params.fee).toLocaleString()} fee) • Total ₦{Number(params.totalCharge).toLocaleString()}
                     </Text>
 
                     <Text className="text-white dark:text-black text-[14px] font-segoe mb-4 leading-5">
-                        Happy Valentine, my person 🤍 I wrapped this in a Q Envelope because you deserve soft surprises. Open it with the secret answer, and know it’s from me.
+                        {params.message}
                     </Text>
 
                     <Text className="text-white dark:text-black text-[14px] font-segoe">
-                        Delivery: WhatsApp • On Valentine
+                        Delivery: {sendViaLabel} • {params.deliveryDate}
                     </Text>
                 </View>
 

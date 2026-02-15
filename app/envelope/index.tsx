@@ -6,6 +6,7 @@ import { Dimensions, Platform, Pressable, Text, TouchableOpacity, View } from 'r
 import Animated, {
     Easing,
     FadeInDown,
+    runOnJS,
     useAnimatedStyle,
     useSharedValue,
     withDelay,
@@ -43,6 +44,7 @@ export default function EnvelopeLanding() {
     const pulse = useSharedValue(1);
     const insets = useSafeAreaInsets();
     const [menuVisible, setMenuVisible] = useState(false);
+    const [isIntroVisible, setIsIntroVisible] = useState(true);
 
     useEffect(() => {
         // Floating animation
@@ -67,7 +69,15 @@ export default function EnvelopeLanding() {
 
         // Transition to main content
         const timeout = setTimeout(() => {
-            introTranslateY.value = withTiming(-height, { duration: 800, easing: Easing.bezier(0.25, 0.1, 0.25, 1) });
+            introTranslateY.value = withTiming(
+                -height,
+                { duration: 800, easing: Easing.bezier(0.25, 0.1, 0.25, 1) },
+                (finished) => {
+                    if (finished) {
+                        runOnJS(setIsIntroVisible)(false);
+                    }
+                }
+            );
             contentOpacity.value = withDelay(400, withTiming(1, { duration: 800 }));
         }, 2500);
 
@@ -113,29 +123,31 @@ export default function EnvelopeLanding() {
             />
 
             {/* Intro Overlay */}
-            <Animated.View style={introStyle}>
-                <View className="flex-1 items-center justify-center overflow-hidden">
-                    {/* Full-screen Heart Pattern Background */}
-                    <Animated.Image
-                        entering={FadeInDown.duration(1000).springify()}
-                        source={require('../../assets/images/envelope-intro.png')}
-                        className="absolute w-full h-full"
-                        resizeMode={Platform.OS === 'web' ? 'contain' : 'cover'}
-                        style={pulseStyle}
-                    />
+            {isIntroVisible && (
+                <Animated.View style={introStyle}>
+                    <View className="flex-1 items-center justify-center overflow-hidden">
+                        {/* Full-screen Heart Pattern Background */}
+                        <Animated.Image
+                            entering={FadeInDown.duration(1000).springify()}
+                            source={require('../../assets/images/envelope-intro.png')}
+                            className="absolute w-full h-full"
+                            resizeMode={Platform.OS === 'web' ? 'contain' : 'cover'}
+                            style={pulseStyle}
+                        />
 
-                    <View className="absolute inset-0 bg-black/20" />
+                        <View className="absolute inset-0 bg-black/20" />
 
-                    {/* Central Logo/Text */}
-                    <Animated.View entering={FadeInDown.delay(500).duration(1000).springify()} className="items-center">
-                        <Animated.View style={pulseStyle} className="w-24 h-24 bg-white rounded-full items-center justify-center shadow-lg shadow-red-500/30 mb-4">
-                            <Ionicons name="heart" size={50} color="#D90429" />
+                        {/* Central Logo/Text */}
+                        <Animated.View entering={FadeInDown.delay(500).duration(1000).springify()} className="items-center">
+                            <Animated.View style={pulseStyle} className="w-24 h-24 bg-white rounded-full items-center justify-center shadow-lg shadow-red-500/30 mb-4">
+                                <Ionicons name="heart" size={50} color="#D90429" />
+                            </Animated.View>
+                            <Text className="text-white text-3xl font-bold font-segoe tracking-widest shadow-lg">Q Envelope</Text>
+                            <Text className="text-white/70 text-sm font-segoe mt-2 tracking-widest">OPENING WITH LOVE</Text>
                         </Animated.View>
-                        <Text className="text-white text-3xl font-bold font-segoe tracking-widest shadow-lg">Q Envelope</Text>
-                        <Text className="text-white/70 text-sm font-segoe mt-2 tracking-widest">OPENING WITH LOVE</Text>
-                    </Animated.View>
-                </View>
-            </Animated.View>
+                    </View>
+                </Animated.View>
+            )}
 
             {/* Main Landing Content */}
             <Animated.View style={contentStyle} className="flex-1 bg-white">

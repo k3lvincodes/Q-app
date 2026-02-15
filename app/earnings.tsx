@@ -21,29 +21,48 @@ const Earnings = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Fetch earnings data from profile or a dedicated earnings table
-      // Note: 'earnings' column does not exist, using 'balance' which is used in dashboard
-      const { data: profile, error } = await supabase
+      // 1. Fetch Profile for Boots Count
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('balance, boots_count')
+        .select('boots_count')
         .eq('id', user.id)
         .single();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-      }
-
-      console.log('Earnings Page - Profile Data:', profile);
-
-      if (profile) {
-        console.log('Setting earnings (balance):', profile.balance);
-        console.log('Setting boots:', profile.boots_count);
-        // Assuming 'earnings' intended to show balance for now
-        setEarnings(profile.balance || 0);
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+      } else if (profile) {
         setBootsCount(profile.boots_count || 0);
       }
+
+      // 2. Fetch Transactions to Calculate Earnings
+      // We want to sum up all 'credit' transactions that are NOT deposits.
+      // Assuming deposits have 'Deposit' in description based on webhook controller.
+      // Ideally, we'd have a 'type' or 'category' column, but for now filtering by description.
+      const { data: transactions, error: txError } = await supabase
+        .from('transactions')
+        .select('amount, type, description')
+        .eq('user_id', user.id)
+        .eq('type', 'credit');
+
+      if (txError) {
+        console.error('Error fetching transactions:', txError);
+      } else if (transactions) {
+        // Filter out deposits
+        const earningsTransactions = transactions.filter(tx => {
+          // Check if it's a deposit
+          const isDeposit = tx.description?.toLowerCase().startsWith('deposit');
+          return !isDeposit;
+        });
+
+        // Sum up the amounts
+        const totalEarnings = earningsTransactions.reduce((sum, tx) => sum + (tx.amount || 0), 0);
+
+        console.log('Total Earnings calculated:', totalEarnings);
+        setEarnings(totalEarnings);
+      }
+
     } catch (error) {
-      console.error('Error fetching earnings:', error);
+      console.error('Error fetching earnings data:', error);
     }
   };
 
@@ -73,7 +92,7 @@ const Earnings = () => {
               className="flex-row items-center bg-white/20 px-4 py-2 rounded-full gap-2"
             >
               <Deposit width={18} height={18} color="white" />
-              <Text className="text-white text-[14px] font-medium">Convert</Text>
+              <Text className="text-white text-[14px] font-medium">Withdraw</Text>
             </TouchableOpacity>
           </View>
 
