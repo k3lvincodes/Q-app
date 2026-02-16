@@ -1,50 +1,112 @@
-# Welcome to your Expo app 👋
+# Q App - Subscription Sharing & Social Gifting Platform
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Q App is a utility-first platform designed to simplify digital subscription sharing and bill splitting among friends and communities. It also includes a social gifting layer, allowing users to send value and rewards seamlessly.
 
-## Get started
+## 🚀 Core Features
 
-1. Install dependencies
+### 1. Subscription Sharing & Management
+-   **Credentials Sharing**: Securely share account access for Netflix, Spotify, and other digital services.
+-   **Bill Splitting**: Automatically calculate and split subscription costs among group members.
+-   **Access Control**: Manage who has access to shared accounts with time-based permissions.
 
-   ```bash
-   npm install
-   ```
+### 2. Earnings & Wallet
+-   **Host Earnings**: Earn money by sharing unused slots in your family plans or multi-user subscriptions.
+-   **Wallet System**: Integrated wallet to receive payments, track earnings, and withdraw funds.
+-   **Transaction History**: Detailed logs of all inflows (earnings, gifts) and outflows.
 
-2. Start the app
+### 3. Social Gifting
+-   **Digital Gifts**: Send monetary gifts or vouchers to friends and family.
+-   **Claim System**: Recipients can securely claim gifts via unique codes (password-protected options available).
+-   **External API**: Third-party integrations for creating and claiming gifts programmatically.
 
-   ```bash
-   npx expo start
-   ```
+### 4. Authentication & Security
+-   **OTP Login**: Passwordless, secure login via email OTP.
+-   **Role-Based Access**: Granular permissions for Users vs. Admins.
+-   **Security**: End-to-end encryption for shared credentials and rigorous API rate limiting.
 
-In the output, you'll find options to open the app in a
+## 🛠 Tech Stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+-   **Frontend**: React Native (Expo) / Next.js
+-   **Backend**: Node.js & Express
+-   **Database**: Supabase (PostgreSQL)
+-   **Authentication**: Supabase Auth
+-   **Language**: TypeScript
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 📂 Project Structure
 
-## Get a fresh project
+-   `app/` - Frontend application code (Screens, Components).
+-   `backend/` - Express backend server for external APIS.
+-   `supabase/` - Database migrations and configuration.
+-   `assets/` - Static assets (Images, Fonts).
 
-When you're ready, run:
+## ⚡ Getting Started
 
-```bash
-npm run reset-project
-```
+### Prerequisites
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+-   **Node.js** (v18 or higher)
+-   **npm** or **yarn**
+-   **Expo CLI**
 
-## Learn more
+### 1. Frontend Setup
 
-To learn more about developing your project with Expo, look at the following resources:
+The frontend is built with Expo.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+1.  Current directory is the root.
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Set up environment variables in `.env`:
+    ```env
+    EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+    EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+    ```
+4.  Start the app:
+    ```bash
+    npx expo start
+    ```
 
-## Join the community
+### 2. Backend Setup
 
-Join our community of developers creating universal apps.
+The backend handles external API requests and secure transactions.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1.  Navigate to the backend directory:
+    ```bash
+    cd backend
+    ```
+2.  Install backend dependencies:
+    ```bash
+    npm install
+    ```
+3.  Set up backend environment variables in `backend/.env`:
+    ```env
+    PORT=3000
+    SUPABASE_URL=your_supabase_url
+    SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+    EXTERNAL_API_KEY=your_secure_api_key
+    DATABASE_URL=your_postgres_connection_string
+    ```
+4.  Start the server:
+    ```bash
+    npm run dev
+    ```
+
+## 📖 API Documentation
+
+The backend provides a documented API for external interactions:
+-   **Authentication**: `/auth/register`, `/auth/login`
+-   **Gifting**: `/gifts/claim`
+
+See [API_DOCUMENTATION.md](./backend/API_DOCUMENTATION.md) for full details.
+
+## 🤝 Contributing
+
+1.  Fork the repository.
+2.  Create a feature branch (`git checkout -b feature/amazing-feature`).
+3.  Commit your changes (`git commit -m 'Add amazing feature'`).
+4.  Push to the branch (`git push origin feature/amazing-feature`).
+5.  Open a Pull Request.
+
+---
+
+Built with ❤️ by the Q App Team.
