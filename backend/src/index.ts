@@ -44,6 +44,10 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello, World!');
 });
 
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/services', servicesRoutes);
