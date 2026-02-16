@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
 import authRoutes from './api/routes/auth.routes';
+import giftsRoutes from './api/routes/gifts.routes';
 import invitesRoutes from './api/routes/invites.routes';
 import notificationsRoutes from './api/routes/notifications.routes';
 import profileRoutes from './api/routes/profile.routes';
@@ -54,6 +55,7 @@ app.use('/api/notifications', notificationsRoutes);
 app.use('/api/invites', invitesRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/webhook', webhookRoutes);
+app.use('/api/gifts', giftsRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

@@ -3,11 +3,23 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+export const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Supabase URL and API Key (Anon or Service Role) must be provided.');
+if (!supabaseUrl || !supabaseServiceKey) {
+  throw new Error('Supabase URL and Service Role Key must be provided.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+// Default admin client (service role)
+export const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+// Helper to create a user-scoped client
+export const getUserSupabase = (accessToken: string) => {
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    global: {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  });
+};

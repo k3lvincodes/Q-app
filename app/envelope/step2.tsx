@@ -23,6 +23,7 @@ export default function EnvelopeStep2() {
     const [date, setDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [unlockHint, setUnlockHint] = useState('');
+    const [unlockPassword, setUnlockPassword] = useState('');
     const [isFocus, setIsFocus] = useState(false);
 
     const onDateChange = (event: any, selectedDate?: Date) => {
@@ -32,7 +33,12 @@ export default function EnvelopeStep2() {
         }
     };
 
-    const canProceed = recipientName.trim().length > 0 && contactInfo.trim().length > 0 && sendVia.length > 0 && date !== null;
+    const canProceed =
+        recipientName.trim().length > 0 &&
+        contactInfo.trim().length > 0 &&
+        sendVia.length > 0 &&
+        date !== null &&
+        (!unlockPassword || unlockHint.trim().length > 0);
 
     return (
         <SafeAreaView className="flex-1 bg-[#F6F4F1] dark:bg-black">
@@ -146,12 +152,30 @@ export default function EnvelopeStep2() {
                             )}
                         </View>
 
-                        {/* Unlock Hint */}
+                        {/* Unlock Password */}
                         <View className="mb-6">
-                            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">Unlock hint (optional)</Text>
+                            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">Unlock password (optional)</Text>
                             <TextInput
                                 className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl h-[48px] px-4 text-black dark:text-white font-segoe"
-                                placeholder="E.g the name you call me when i am happy"
+                                placeholder="Enter password (optional)"
+                                placeholderTextColor="#9CA3AF"
+                                value={unlockPassword}
+                                onChangeText={setUnlockPassword}
+                                secureTextEntry
+                            />
+                            <Text className="text-gray-500 dark:text-gray-400 text-xs font-segoe mt-2">
+                                If set, only the recipient who knows this can opens it.
+                            </Text>
+                        </View>
+
+                        {/* Unlock Hint */}
+                        <View className="mb-6">
+                            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">
+                                Unlock hint {unlockPassword && <Text className="text-red-500">*</Text>}
+                            </Text>
+                            <TextInput
+                                className={`bg-white dark:bg-gray-900 border rounded-xl h-[48px] px-4 text-black dark:text-white font-segoe ${unlockPassword && !unlockHint ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'}`}
+                                placeholder={unlockPassword ? "Required when password is set" : "E.g the name you call me when i am happy"}
                                 placeholderTextColor="#9CA3AF"
                                 value={unlockHint}
                                 onChangeText={setUnlockHint}
@@ -184,6 +208,7 @@ export default function EnvelopeStep2() {
                                 contactInfo,
                                 deliveryDate: date.toDateString(),
                                 unlockHint,
+                                unlockPassword,
                             }
                         })}
                         disabled={!canProceed}

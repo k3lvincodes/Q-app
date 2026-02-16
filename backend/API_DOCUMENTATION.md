@@ -4,8 +4,8 @@ This API allows external Q projects to authenticate users against the centralize
 
 ## Base URL
 
-- **Development**: `http://localhost:3000/api/auth`
-- **Production**: `https://api.joinq.ng/api/auth`
+- **Development**: `http://localhost:3000/api`
+- **Production**: `https://api.joinq.ng/api`
 
 ---
 
@@ -20,7 +20,7 @@ All requests to this API must include the `x-api-key` header.
 
 **Example**:
 ```http
-POST /register HTTP/1.1
+POST /auth/register HTTP/1.1
 Host: api.joinq.ng
 x-api-key: YOUR_SECURE_API_KEY
 Content-Type: application/json
@@ -31,7 +31,8 @@ Content-Type: application/json
 
 To prevent abuse, requests are rate-limited.
 
-- **Limit**: 5 requests per minute per IP address.
+- **General API**: 5 requests per minute per IP address.
+- **OTP Generation** (`/auth/register`, `/auth/login`, `/auth/otp`): **1 request per minute** per Email/IP.
 - **Response**: `429 Too Many Requests` if the limit is exceeded.
 
 ---
@@ -42,7 +43,7 @@ To prevent abuse, requests are rate-limited.
 
 Registers a new user and sends an OTP to their email.
 
-- **URL**: `/register`
+- **URL**: `/auth/register`
 - **Method**: `POST`
 - **Content-Type**: `application/json`
 
@@ -86,7 +87,7 @@ Registers a new user and sends an OTP to their email.
 
 Initiates login for an existing user by sending an OTP.
 
-- **URL**: `/login`
+- **URL**: `/auth/login`
 - **Method**: `POST`
 - **Content-Type**: `application/json`
 
@@ -123,7 +124,7 @@ Initiates login for an existing user by sending an OTP.
 
 Verifies the OTP sent to the user and returns session tokens.
 
-- **URL**: `/verify`
+- **URL**: `/auth/verify`
 - **Method**: `POST`
 - **Content-Type**: `application/json`
 
@@ -164,5 +165,66 @@ Verifies the OTP sent to the user and returns session tokens.
     ```json
     {
       "error": "Unauthorized: Invalid or missing API Key"
+    }
+    ```
+
+---
+
+### 4. Claim Gift
+
+Allows an authenticated user to claim a gift using a gift code.
+
+- **URL**: `/gifts/claim`
+- **Method**: `POST`
+- **Content-Type**: `application/json`
+- **Headers**:
+    - `x-api-key`: Your Project API Key.
+    - `Authorization`: `Bearer <access_token>` (User session token obtained from `/verify`)
+
+#### Request Body
+
+| Field | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `gift_code` | `string` | Yes | The unique code of the gift to claim. |
+| `password` | `string` | No | Required if the gift is password-protected. |
+
+#### Responses
+
+- **200 OK**
+    ```json
+    {
+      "success": true,
+      "message": "Gift claimed successfully",
+      "amount": 100,
+      "currency": "NGN",
+      "id": "gift_uuid"
+    }
+    ```
+- **400 Bad Request**
+    ```json
+    {
+      "success": false,
+      "error": "Gift code is required"
+    }
+    ```
+- **401 Unauthorized**
+    ```json
+    {
+      "success": false,
+      "error": "User must be logged in"
+    }
+    ```
+- **404 Not Found**
+    ```json
+    {
+      "success": false,
+      "error": "Gift not found"
+    }
+    ```
+- **422 Unprocessable Entity**
+    ```json
+    {
+      "success": false,
+      "error": "Gift already claimed" 
     }
     ```
