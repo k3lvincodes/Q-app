@@ -7,7 +7,6 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const sendViaData = [
-    { label: "WhatsApp", value: 'whatsapp' },
     { label: 'Email', value: 'email' },
     { label: 'SMS', value: 'sms' },
 ];
@@ -18,7 +17,7 @@ export default function EnvelopeStep2() {
     const params = useLocalSearchParams();
 
     const [recipientName, setRecipientName] = useState('');
-    const [sendVia, setSendVia] = useState('whatsapp');
+    const [sendVia, setSendVia] = useState('email');
     const [contactInfo, setContactInfo] = useState('');
     const [date, setDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -116,11 +115,11 @@ export default function EnvelopeStep2() {
                         {/* Phone or Email */}
                         <View className="mb-6">
                             <Text className="text-gray-700 dark:text-gray-300 mb-2 font-segoe text-[16px]">
-                                {sendVia === 'whatsapp' ? 'Receiver WhatsApp Number' : sendVia === 'email' ? 'Receiver Email' : 'Receiver Phone Number'}
+                                {sendVia === 'email' ? 'Receiver Email' : 'Receiver Phone Number'}
                             </Text>
                             <TextInput
                                 className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl h-[48px] px-4 text-black dark:text-white font-segoe"
-                                placeholder={sendVia === 'whatsapp' ? 'Enter receiver WhatsApp number' : sendVia === 'email' ? 'Enter receiver email address' : 'Enter receiver phone number'}
+                                placeholder={sendVia === 'email' ? 'Enter receiver email address' : 'Enter receiver phone number'}
                                 placeholderTextColor="#9CA3AF"
                                 keyboardType={sendVia === 'email' ? 'email-address' : 'phone-pad'}
                                 value={contactInfo}

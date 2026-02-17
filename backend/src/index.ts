@@ -61,6 +61,9 @@ app.use('/api/support', supportRoutes);
 app.use('/api/webhook', webhookRoutes);
 app.use('/api/gifts', giftsRoutes);
 
+import { startBalanceScheduler } from './services/balanceScheduler';
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+  startBalanceScheduler();
 });

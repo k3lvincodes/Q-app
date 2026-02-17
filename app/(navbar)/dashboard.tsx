@@ -90,12 +90,8 @@ const Dashboard = () => {
       setSubscriptions(formattedSubs);
       setTransactions(transResponse.data as any || []);
 
-      // Calculate balance dynamically from transactions
-      const calculatedBalance = (transResponse.data as any || []).reduce((acc: number, tx: any) => {
-        return tx.type === 'credit' ? acc + tx.amount : acc - tx.amount;
-      }, 0);
-
-      setBalance(calculatedBalance);
+      const profileBalance = profileResponse.data?.balance || 0;
+      setBalance(profileBalance);
 
     } catch (err) {
       setError(err as Error);
@@ -175,10 +171,8 @@ const Dashboard = () => {
             // or rely on the profile listener below
 
             // Update balance locally based on the new transaction
-            setBalance((prev) => {
-              const amount = payload.new.amount || 0;
-              return payload.new.type === 'credit' ? prev + amount : prev - amount;
-            });
+            // Refresh data to get authoritative balance from DB (which includes boots deduction logic)
+            refreshData();
           }
         )
         .subscribe((status) => {

@@ -1,6 +1,7 @@
 import UserMenu from "@/components/User/UserMenu";
 import { supabase } from '@/utils/supabase';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useRef, useState } from 'react';
@@ -65,6 +66,20 @@ export default function EnvelopeStep3() {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('User not authenticated');
 
+            // Check Balance
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('balance')
+                .eq('id', user.id)
+                .single();
+
+            if (profileError) throw new Error('Failed to fetch wallet balance');
+
+            const totalAmount = parseFloat(params.totalCharge as string);
+            if (profile.balance < totalAmount) {
+                throw new Error(`Insufficient wallet balance. You need ₦${totalAmount.toLocaleString()} but have ₦${profile.balance.toLocaleString()}`);
+            }
+
             const { error } = await supabase
                 .from('gifts')
                 .insert({
@@ -82,6 +97,54 @@ export default function EnvelopeStep3() {
                 });
 
             if (error) throw error;
+
+            // Send Notification
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const token = session?.access_token;
+
+                const senderName = user.user_metadata?.full_name || 'Someone';
+                // Fallback URL if env var is missing (dev logic)
+                const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'https://joinq.ng';
+
+                const channelMap: Record<string, string> = {
+                    'whatsapp': 'whatsapp',
+                    'email': 'email',
+                    'sms': 'sms'
+                };
+                const channel = channelMap[params.sendVia as string] || 'sms';
+
+                // Determine recipient fields based on channel
+                const payload: any = {
+                    sender_name: senderName,
+                    gift_type: giftLabel,
+                    gift_code: code,
+                    amount: params.recipientAmount,
+                    channel: channel
+                };
+
+                if (channel === 'email') {
+                    payload.recipient_email = params.contactInfo;
+                } else {
+                    payload.recipient_phone = params.contactInfo;
+                }
+
+                if (token) {
+                    await axios.post(`${apiUrl}/api/gifts/notify`, payload, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    console.log(`Notification sent via ${channel}`);
+                } else {
+                    console.warn('Skipping Notification: No Auth Token available');
+                }
+
+            } catch (notifyError: any) {
+                console.error('Notification failed:', notifyError.message);
+                // Don't block success flow
+            }
 
             setGiftCode(code);
             setShowSuccess(true);
