@@ -80,23 +80,9 @@ export const handlePaystackWebhook = async (req: Request, res: Response) => {
             }
 
             // 4. Update User Balance
-            // Use the RPC function if created, otherwise direct update
-            const { error: balanceError } = await supabase
-                .rpc('increment_balance', { user_id: userId, amount: amountInNaira });
-
-            if (balanceError) {
-                console.error('Failed to increment balance:', balanceError);
-                // Fallback to manual update if RPC fails/doesn't exist
-                const { error: manualUpdateError } = await supabase
-                    .from('profiles')
-                    .update({ balance: (userData?.balance || 0) + amountInNaira })
-                    .eq('id', userId);
-
-                if (manualUpdateError) {
-                    console.error('Failed to manual update balance:', manualUpdateError);
-                    return res.sendStatus(500);
-                }
-            }
+            // REMOVED: Managed by trg_apply_wallet on transactions table
+            console.log(`Successfully processed deposit of ₦${amountInNaira} for user ${userId}`);
+            return res.sendStatus(200);
 
             console.log(`Successfully processed deposit of ₦${amountInNaira} for user ${userId}`);
             return res.sendStatus(200);

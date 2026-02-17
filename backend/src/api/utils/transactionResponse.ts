@@ -33,40 +33,7 @@ export const recordTransaction = async (
         }
 
         // 2. Update User Balance
-        // Calculate new balance delta
-        const balanceChange = type === 'credit' ? amount : -amount;
-
-        // Use RPC if available, else manual update
-        const { error: rpcError } = await supabase
-            .rpc('increment_balance', { user_id: userId, amount: balanceChange });
-
-        if (rpcError) {
-            // Fallback to manual update
-            // Fetch current balance
-            const { data: userData, error: fetchError } = await supabase
-                .from('profiles')
-                .select('balance')
-                .eq('id', userId)
-                .single();
-
-            if (fetchError) {
-                console.error('Failed to fetch user balance:', fetchError);
-                return { success: false, error: 'Failed to update balance' };
-            }
-
-            const newBalance = (userData?.balance || 0) + balanceChange;
-
-            const { error: updateError } = await supabase
-                .from('profiles')
-                .update({ balance: newBalance })
-                .eq('id', userId);
-
-            if (updateError) {
-                console.error('Failed to manual update balance:', updateError);
-                // Note: Transaction record exists but balance failed. Inconsistancy risk.
-                return { success: false, error: 'Transaction recorded but balance update failed' };
-            }
-        }
+        // REMOVED: Managed by trg_apply_wallet on transactions table
 
         return { success: true, data: transaction };
 

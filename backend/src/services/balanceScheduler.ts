@@ -42,9 +42,9 @@ const updateBalances = async () => {
 };
 
 export const startBalanceScheduler = () => {
-    console.log(`Starting Balance Scheduler (DISABLED FOR E2E TESTING)`);
-    // setInterval(updateBalances, INTERVAL_MS);
+    console.log(`Starting Balance Scheduler (Every ${INTERVAL_MS}ms)`);
+    setInterval(updateBalances, INTERVAL_MS);
 
     // Run immediately on start
-    // updateBalances();
+    updateBalances();
 };
