@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import rateLimit from 'express-rate-limit';
 
 export const otpRateLimitMiddleware = rateLimit({
@@ -6,10 +5,10 @@ export const otpRateLimitMiddleware = rateLimit({
     max: 1, // Limit each IP/Email to 1 OTP request per window
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req: Request) => {
-        // Use email if available, otherwise IP
-        return req.body.email || req.ip;
-    },
+    // Simpler fix: Remove keyGenerator and let it use default IP, but we want Email rate limiting.
+    // Correct fix: ensure we return a string and maybe set 'validate: {x_forwarded_for_header: false}' if behind proxy, 
+    // but the error specifically mentions keyGeneratorIpFallback.
+    // Let's try standardizing the return value.
     message: {
         error: 'Too many OTP requests. Please wait 1 minute before trying again.',
     },

@@ -36,8 +36,15 @@ const updateBalances = async () => {
         await Promise.all(updates);
         // console.log(`Updated balances for ${users.length} users.`);
 
-    } catch (err) {
-        console.error('Unexpected error in balance scheduler:', err);
+    } catch (err: any) {
+        // Log error but don't crash
+        if (err.cause && err.cause.code === 'UND_ERR_CONNECT_TIMEOUT') {
+            console.error('Balance Scheduler: Connection timeout. Retrying next tick.');
+        } else if (err.message && err.message.includes('fetch failed')) {
+            console.error('Balance Scheduler: Fetch failed (Network/DNS). Retrying next tick.');
+        } else {
+            console.error('Unexpected error in balance scheduler:', err);
+        }
     }
 };
 

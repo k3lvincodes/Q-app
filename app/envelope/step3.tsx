@@ -99,13 +99,13 @@ export default function EnvelopeStep3() {
             if (error) throw error;
 
             // Send Notification
+            // Fallback URL if env var is missing (dev logic)
+            const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'https://joinq.ng';
+
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 const token = session?.access_token;
-
                 const senderName = user.user_metadata?.full_name || 'Someone';
-                // Fallback URL if env var is missing (dev logic)
-                const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'https://joinq.ng';
 
                 const channelMap: Record<string, string> = {
                     'whatsapp': 'whatsapp',
@@ -129,6 +129,7 @@ export default function EnvelopeStep3() {
                     payload.recipient_phone = params.contactInfo;
                 }
 
+                console.log(`Sending notification to: ${apiUrl}/api/gifts/notify`);
                 if (token) {
                     await axios.post(`${apiUrl}/api/gifts/notify`, payload, {
                         headers: {
@@ -142,7 +143,7 @@ export default function EnvelopeStep3() {
                 }
 
             } catch (notifyError: any) {
-                console.error('Notification failed:', notifyError.message);
+                console.error(`Notification failed (${apiUrl}):`, notifyError.message);
                 // Don't block success flow
             }
 
