@@ -24,18 +24,23 @@ const allowedOrigins = [
   'http://localhost:3001',
   'https://joinq.ng',
   'http://localhost:8081', // Internal App Dev
-  'http://localhost:3000' // Self
+  'http://localhost:3000', // Self
+  'http://10.199.138.172:8081', // LAN Dev - Phone
+  'exp://10.199.138.172:8081' // Expo Go
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+
+    // In development (or if allowedOrigins includes it), allow
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
     }
-    return callback(null, true);
+
+    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+    return callback(new Error(msg), false);
   }
 }));
 app.use(express.json());

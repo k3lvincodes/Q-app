@@ -12,11 +12,19 @@ export const sendSMS = async (to: string[], message: string, sender_name = 'Send
         return { success: false, error: 'Missing API Key' };
     }
 
+    // Format phone numbers to 234...
+    const formattedTo = to.map(phone => {
+        let p = phone.replace(/\s+/g, ''); // Remove spaces
+        if (p.startsWith('0')) return '234' + p.substring(1);
+        if (p.startsWith('+234')) return p.substring(1);
+        return p;
+    });
+
     try {
         const response = await axios.post(
             `${SENDCHAMP_API_URL}/sms/send`,
             {
-                to,
+                to: formattedTo,
                 message,
                 sender_name,
                 route: 'dnd'

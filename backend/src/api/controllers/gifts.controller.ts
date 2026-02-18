@@ -72,10 +72,12 @@ import { sendEmailResend } from '../../services/resend';
 import { sendSMS } from '../../services/sendchamp';
 
 export const sendGiftNotification = async (req: Request, res: Response) => {
-    const { recipient_phone, recipient_email, sender_name, gift_type, gift_code, amount, channel } = req.body;
+    const { recipient_phone, recipient_email, recipient_name, sender_name, gift_type, gift_code, amount, channel } = req.body;
     const authHeader = req.headers.authorization;
+    console.log('[DEBUG] /notify Auth Header:', authHeader ? `${authHeader.substring(0, 20)}...` : 'Missing');
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        console.log('[DEBUG] /notify 401: Invalid Header Format');
         return res.status(401).json({ error: 'Missing or invalid Authorization header' });
     }
 
@@ -86,6 +88,7 @@ export const sendGiftNotification = async (req: Request, res: Response) => {
     const { data: { user }, error: authError } = await userSupabase.auth.getUser();
 
     if (authError || !user) {
+        console.log('[DEBUG] /notify 401: Auth Failed', authError?.message);
         return res.status(401).json({ error: 'Unauthorized: Invalid token' });
     }
 
@@ -96,12 +99,14 @@ export const sendGiftNotification = async (req: Request, res: Response) => {
     try {
         const formattedAmount = Number(amount).toLocaleString();
         const link = `https://joinq.ng/claim?${gift_code}`;
-        const messageText = `Hello! ${sender_name} just sent you a ${gift_type} gift worth NGN ${formattedAmount} on Q. Claim it here: ${link}`;
+        // Ensure nice spacing: "Hello Name!" or "Hello!"
+        const greeting = recipient_name ? `Hello ${recipient_name}!` : 'Hello!';
+        const messageText = `${greeting} ${sender_name} just sent you a ${gift_type} gift worth NGN ${formattedAmount} on Q. Claim it here: ${link}`;
         const emailSubject = `You received a gift from ${sender_name}!`;
         const emailHtml = `
             <div style="font-family: Arial, sans-serif; color: #333;">
                 <h2>You've got a gift!</h2>
-                <p>Hello,</p>
+                <p>Hello ${recipient_name || 'there'},</p>
                 <p><strong>${sender_name}</strong> sent you a <strong>${gift_type}</strong> worth <strong>NGN ${formattedAmount}</strong>.</p>
                 <p>Click the link below to claim it:</p>
                 <p><a href="${link}" style="display: inline-block; background-color: #EF5323; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Claim Gift</a></p>

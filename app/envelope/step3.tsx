@@ -117,6 +117,7 @@ export default function EnvelopeStep3() {
                 // Determine recipient fields based on channel
                 const payload: any = {
                     sender_name: senderName,
+                    recipient_name: params.recipientName,
                     gift_type: giftLabel,
                     gift_code: code,
                     amount: params.recipientAmount,
