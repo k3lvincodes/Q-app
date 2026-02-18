@@ -214,6 +214,16 @@ Allows an authenticated user to claim a gift using a gift code.
       "error": "User must be logged in"
     }
     ```
+- **200 OK (Password Required)**
+    - This occurs if the gift is password-protected and no password was provided.
+    ```json
+    {
+      "success": false,
+      "error": "Password required",
+      "password_required": true,
+      "hint": "The hint for the password"
+    }
+    ```
 - **404 Not Found**
     ```json
     {

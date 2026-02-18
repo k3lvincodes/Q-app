@@ -34,7 +34,8 @@ export const claimGift = async (req: Request, res: Response) => {
 
         // 2. Check password requirement
         if (gift.unlock_password && !password) {
-            return res.status(401).json({
+            return res.status(200).json({
+                success: false,
                 error: 'Password required',
                 password_required: true,
                 hint: gift.unlock_hint
