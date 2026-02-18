@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
 import authRoutes from './api/routes/auth.routes';
+import depositRoutes from './api/routes/deposit.routes';
 import giftsRoutes from './api/routes/gifts.routes';
 import invitesRoutes from './api/routes/invites.routes';
 import notificationsRoutes from './api/routes/notifications.routes';
@@ -12,6 +13,7 @@ import supportRoutes from './api/routes/support.routes';
 import transactionsRoutes from './api/routes/transactions.routes';
 import uploadRoutes from './api/routes/upload.routes';
 import webhookRoutes from './api/routes/webhook.routes';
+import withdrawRoutes from './api/routes/withdraw.routes';
 
 import cors from 'cors';
 
@@ -64,6 +66,8 @@ app.use('/api/notifications', notificationsRoutes);
 app.use('/api/invites', invitesRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/webhook', webhookRoutes);
+app.use('/api/withdraw', withdrawRoutes);
+app.use('/api/deposit', depositRoutes);
 app.use('/api/gifts', giftsRoutes);
 
 import { startBalanceScheduler } from './services/balanceScheduler';

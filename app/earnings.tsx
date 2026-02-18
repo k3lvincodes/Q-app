@@ -4,11 +4,14 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Arrow from "../assets/svg/arrow.svg";
 import Deposit from "../assets/svg/deposit.svg";
+import WithdrawModal from "../components/WithdrawModal";
 import { supabase } from "../utils/supabase";
 
 const Earnings = () => {
   const [earnings, setEarnings] = useState<number>(0);
   const [bootsCount, setBootsCount] = useState<number>(0);
+
+  const [withdrawModalVisible, setWithdrawModalVisible] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -41,8 +44,13 @@ const Earnings = () => {
   };
 
   const handleConvert = () => {
-    // TODO: Implement convert functionality
-    console.log('Convert pressed');
+    setWithdrawModalVisible(true);
+  };
+
+  const handleWithdrawSubmit = (amount: string, accountNumber: string, bankCode: string, bankName: string) => {
+    console.log("Withdrawal Request:", { amount, accountNumber, bankCode, bankName });
+    // TODO: Implement actual withdrawal logic here
+    setWithdrawModalVisible(false);
   };
 
   return (
@@ -84,6 +92,13 @@ const Earnings = () => {
           </View>
         </View>
       </View>
+
+      <WithdrawModal
+        visible={withdrawModalVisible}
+        onClose={() => setWithdrawModalVisible(false)}
+        onSubmit={handleWithdrawSubmit}
+        earningsBalance={earnings}
+      />
     </SafeAreaView>
   );
 };

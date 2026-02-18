@@ -1,7 +1,10 @@
 import axios from 'axios';
 import Constants from 'expo-constants';
 
-const PAYMENT_API_URL = 'https://q-payment-api.vercel.app/api';
+const PAYMENT_API_URL =
+    Constants.expoConfig?.extra?.BACKEND_URL ||
+    process.env.EXPO_PUBLIC_BACKEND_URL ||
+    'http://localhost:3000/api';
 
 // Try multiple sources for the API key
 const API_KEY =
@@ -79,6 +82,56 @@ export const initiateDeposit = async (email: string, amount: string, userId: str
         if (axios.isAxiosError(error)) {
             console.error('Axios Error details:', error.response?.data);
             throw new Error(error.response?.data?.message || 'Failed to initiate deposit');
+        }
+        throw error;
+    }
+};
+
+export interface WithdrawResponse {
+    message: string;
+    data: {
+        reference: string;
+        status: string;
+        amount: number;
+        transfer_code: string;
+    };
+}
+
+export const initiateWithdraw = async (
+    userId: string,
+    amount: number,
+    account_number: string,
+    bank_code: string,
+    account_name: string,
+    bank_name: string
+): Promise<WithdrawResponse> => {
+    console.log('Initiating withdrawal for user:', userId, 'Amount:', amount);
+
+    try {
+        const response = await axios.post(
+            `${PAYMENT_API_URL}/withdraw/initiate`,
+            {
+                userId,
+                amount,
+                account_number,
+                bank_code,
+                account_name,
+                bank_name // passing these for record keeping if needed by backend
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': API_KEY,
+                },
+            }
+        );
+        console.log('Withdraw API Response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Withdraw API Error:', error);
+        if (axios.isAxiosError(error)) {
+            console.error('Axios Error details:', error.response?.data);
+            throw new Error(error.response?.data?.error || 'Failed to initiate withdrawal');
         }
         throw error;
     }
