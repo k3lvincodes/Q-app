@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -189,8 +191,13 @@ const DepositModal = ({ modalVisible, setModalVisible }: ModalType) => {
     }
 
     return (
-      <Pressable className="bg-white rounded-xl px-5 w-full mx-5 py-10" onPress={() => { }}>
-        <Text className="font-bold text-[24px]">Deposit</Text>
+      <View className="bg-white rounded-xl px-5 w-full mx-5 py-10">
+        <View className="flex-row justify-between items-center">
+          <Text className="font-bold text-[24px]">Deposit</Text>
+          <Pressable onPress={handleClose} className="p-2">
+            <Text className="text-gray-400 text-xl">✕</Text>
+          </Pressable>
+        </View>
         <Text className="text-gray-500 pt-2">
           Withdrawals are not supported only deposit the money you need for a subscription.
         </Text>
@@ -212,7 +219,7 @@ const DepositModal = ({ modalVisible, setModalVisible }: ModalType) => {
             <Text className="text-white font-bold text-[14px]">Deposit</Text>
           )}
         </Pressable>
-      </Pressable>
+      </View>
     );
   };
 
@@ -225,12 +232,12 @@ const DepositModal = ({ modalVisible, setModalVisible }: ModalType) => {
           visible={modalVisible}
           onRequestClose={handleClose}
         >
-          <Pressable
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.backdrop}
-            onPress={paymentStatus === 'idle' ? handleClose : undefined}
           >
             {renderContent()}
-          </Pressable>
+          </KeyboardAvoidingView>
         </Modal>
       </SafeAreaView>
     </SafeAreaProvider>

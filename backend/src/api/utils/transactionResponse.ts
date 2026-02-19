@@ -22,7 +22,7 @@ export const recordTransaction = async (
                 amount: amount,
                 type: type,
                 description: description,
-                related_request_id: relatedRequestId
+                ...(relatedRequestId ? { idempotency_key: relatedRequestId } : {}),
             })
             .select()
             .single();

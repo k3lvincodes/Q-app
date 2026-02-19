@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Arrow from "../assets/svg/arrow.svg";
 import Deposit from "../assets/svg/deposit.svg";
 import WithdrawModal from "../components/WithdrawModal";
+import { initiateWithdraw } from "../utils/paymentApi";
 import { supabase } from "../utils/supabase";
 
 const Earnings = () => {
@@ -47,10 +48,14 @@ const Earnings = () => {
     setWithdrawModalVisible(true);
   };
 
-  const handleWithdrawSubmit = (amount: string, accountNumber: string, bankCode: string, bankName: string) => {
-    console.log("Withdrawal Request:", { amount, accountNumber, bankCode, bankName });
-    // TODO: Implement actual withdrawal logic here
-    setWithdrawModalVisible(false);
+  const handleWithdrawSubmit = async (amount: string, accountNumber: string, bankCode: string, bankName: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not found. Please log in again.');
+
+    await initiateWithdraw(user.id, parseFloat(amount), accountNumber, bankCode, '', bankName);
+
+    // Refresh earnings after successful withdrawal
+    await fetchEarnings();
   };
 
   return (
