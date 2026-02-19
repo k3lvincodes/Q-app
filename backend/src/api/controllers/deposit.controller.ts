@@ -90,6 +90,16 @@ export const verifyDeposit = async (req: Request, res: Response) => {
                         console.error('Failed to insert deposit transaction:', txError);
                     } else {
                         console.log(`✅ Deposit credited: ₦${amountInNaira} for user ${userId}`);
+
+                        // Recalculate balance as fallback in case trigger isn't active
+                        const { error: rpcError } = await supabase.rpc('recalculate_balance', {
+                            user_uuid: userId,
+                        });
+                        if (rpcError) {
+                            console.error('Failed to recalculate balance:', rpcError);
+                        } else {
+                            console.log(`✅ Balance recalculated for user ${userId}`);
+                        }
                     }
                 } else {
                     console.error(`Could not determine user for deposit ref: ${reference}`);
