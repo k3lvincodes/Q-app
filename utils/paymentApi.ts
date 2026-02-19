@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 
 const PAYMENT_API_URL =
     Constants.expoConfig?.extra?.BACKEND_URL ||
-    process.env.EXPO_PUBLIC_BACKEND_URL ||
+    (process.env.EXPO_PUBLIC_API_URL ? `${process.env.EXPO_PUBLIC_API_URL}/api` : null) ||
     'http://localhost:3000/api';
 
 // Try multiple sources for the API key
