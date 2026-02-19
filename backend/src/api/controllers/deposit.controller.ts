@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { supabase } from '../../config/supabase';
 import { initializeTransaction, verifyTransaction } from '../../services/paystack';
 
 export const initiateDeposit = async (req: Request, res: Response) => {
@@ -47,12 +48,61 @@ export const verifyDeposit = async (req: Request, res: Response) => {
             return res.status(500).json({ error: result.error || 'Failed to verify transaction' });
         }
 
-        const { status, amount, customer, channel, paid_at } = result.data;
+        const { status, amount, customer, channel, paid_at, metadata } = result.data;
+        const amountInNaira = amount / 100; // Convert from kobo to naira
+
+        // If Paystack confirms success, credit the user's balance
+        if (status === 'success') {
+            // Use reference as idempotency_key to prevent double-crediting
+            const { data: existingTx } = await supabase
+                .from('transactions')
+                .select('id')
+                .eq('idempotency_key', `deposit_${reference}`)
+                .single();
+
+            if (!existingTx) {
+                // Determine user_id from metadata or by looking up the email
+                let userId = metadata?.user_id;
+
+                if (!userId && customer?.email) {
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('id')
+                        .eq('email', customer.email)
+                        .single();
+                    userId = profile?.id;
+                }
+
+                if (userId) {
+                    const { error: txError } = await supabase
+                        .from('transactions')
+                        .insert({
+                            user_id: userId,
+                            amount: amountInNaira,
+                            total: amountInNaira,
+                            type: 'deposit_credit',
+                            apply_mode: 'db',
+                            description: `Deposit via ${channel || 'card'} (Ref: ${reference})`,
+                            idempotency_key: `deposit_${reference}`,
+                        });
+
+                    if (txError) {
+                        console.error('Failed to insert deposit transaction:', txError);
+                    } else {
+                        console.log(`✅ Deposit credited: ₦${amountInNaira} for user ${userId}`);
+                    }
+                } else {
+                    console.error(`Could not determine user for deposit ref: ${reference}`);
+                }
+            } else {
+                console.log(`Deposit ref ${reference} already credited, skipping.`);
+            }
+        }
 
         return res.status(200).json({
             status,
             message: status === 'success' ? 'Transaction verified successfully' : `Transaction status: ${status}`,
-            amount: amount / 100, // Convert from kobo to naira
+            amount: amountInNaira,
             customer,
             channel,
             paid_at,
